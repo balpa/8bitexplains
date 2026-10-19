@@ -22,5 +22,14 @@ mkdir -p "$ROOT/models"
 "$ROOT/tools/.venv/bin/python" -I "$ROOT/tools/chiptune.py" "$ROOT/remotion/src/generated/$ID.json"
 
 mkdir -p "$ROOT/out"
-(cd "$ROOT/remotion" && npx remotion render src/index.ts "$ID" "$ROOT/out/$ID.mp4" --codec=h264 --crf=18)
+# Remotion's built-in static server stalls the headless browser on this machine,
+# so serve the bundle with Python and point Remotion at the URL instead.
+BUNDLE="$(mktemp -d)"
+PORT=8769
+(cd "$ROOT/remotion" && ./node_modules/.bin/remotion bundle src/index.ts --out-dir="$BUNDLE")
+python3 -m http.server "$PORT" --bind 127.0.0.1 --directory "$BUNDLE" >/dev/null 2>&1 &
+SERVER=$!
+trap 'kill "$SERVER" 2>/dev/null; rm -rf "$BUNDLE"' EXIT
+sleep 1
+(cd "$ROOT/remotion" && ./node_modules/.bin/remotion render "http://127.0.0.1:$PORT" "$ID" "$ROOT/out/$ID.mp4" --codec=h264 --crf=18)
 echo "done: out/$ID.mp4"
