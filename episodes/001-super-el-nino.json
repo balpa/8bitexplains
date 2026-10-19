@@ -1,0 +1,84 @@
+{
+  "id": "ep001",
+  "title": "A super El Nino is coming",
+  "voice": "am_michael",
+  "speed": 1.08,
+  "trend": "NOAA ENSO Diagnostic Discussion of 8 Oct 2026; covered as 'super El Nino' by Science and ScienceDaily trending topics (Global Warming, Weather) the week of 12-18 Oct 2026",
+  "sources": [
+    "NOAA Climate Prediction Center, ENSO Diagnostic Discussion, 8 October 2026 - https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/ensodisc.shtml",
+    "NOAA Ocean Service, What are El Nino and La Nina? - https://oceanservice.noaa.gov/facts/ninonina.html"
+  ],
+  "caption": "The Pacific is running a fever 🌊🔥 NOAA says a strong-to-very strong El Niño is likely through early 2027, and it could beat every El Niño since 1950.\n\nSources (public domain, NOAA):\n- NOAA Climate Prediction Center, ENSO Diagnostic Discussion, 8 Oct 2026\n- NOAA Ocean Service, What are El Niño and La Niña?\n\nNot affiliated with or endorsed by NOAA.\n\n#ElNino #climate #weather #science #learnontiktok #8bit",
+  "scenes": [
+    {
+      "visual": "hook",
+      "title": "SUPER EL NINO",
+      "sub": "INCOMING",
+      "vo": [
+        "The Pacific Ocean is running a fever.",
+        "And it could become the strongest El Niño since 1950."
+      ]
+    },
+    {
+      "visual": "normal",
+      "title": "LEVEL 1",
+      "sub": "NORMAL MODE",
+      "vo": [
+        "Normally, trade winds push warm water west, toward Asia.",
+        "Cold water rises up to replace it."
+      ]
+    },
+    {
+      "visual": "elnino",
+      "title": "LEVEL 2",
+      "sub": "EL NINO MODE",
+      "vo": [
+        "In El Niño, those winds weaken.",
+        "The warm water sloshes back east, toward the Americas."
+      ]
+    },
+    {
+      "visual": "stat",
+      "title": "LEVEL 3",
+      "sub": "THIS YEAR",
+      "stat": "+2.1 C",
+      "statLabel": "ABOVE NORMAL",
+      "vo": [
+        "Right now, part of the Pacific is two point one degrees above normal.",
+        "NOAA expects it to stay strong into early twenty twenty-seven."
+      ]
+    },
+    {
+      "visual": "effects",
+      "title": "LEVEL 4",
+      "sub": "WORLD EFFECTS",
+      "items": [
+        "JET STREAM SHIFTS",
+        "NORTH US: WARM+DRY",
+        "GULF + SOUTHEAST: WET"
+      ],
+      "vo": [
+        "That shifts the jet stream.",
+        "The northern US often gets warmer and drier.",
+        "The Gulf Coast and Southeast get wetter."
+      ]
+    },
+    {
+      "visual": "fact",
+      "title": "BONUS",
+      "sub": "NAME ORIGIN",
+      "vo": [
+        "Fun fact: fishermen named it in the sixteen hundreds.",
+        "It peaked near Christmas, so they called it El Niño. The little boy."
+      ]
+    },
+    {
+      "visual": "outro",
+      "title": "SAVE POINT",
+      "sub": "SAVE THIS FOR LATER",
+      "vo": [
+        "Save this, and follow Eight Bit Explains for more."
+      ]
+    }
+  ]
+}
