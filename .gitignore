@@ -1,0 +1,9 @@
+.DS_Store
+tools/.venv/
+models/
+remotion/node_modules/
+remotion/public/ep*/
+remotion/public/sfx/
+remotion/src/generated/
+out/
+__pycache__/
