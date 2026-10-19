@@ -1,118 +1,168 @@
-import React from "react";
-import { AbsoluteFill, Audio, Sequence, random, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { step } from "./pixel";
-import { SceneArt } from "./scenes";
-import { C, PIXEL_FONT, SAFE } from "./theme";
+import React, { useLayoutEffect, useRef } from "react";
+import { AbsoluteFill, Audio, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
+import { Buf, H, W, dissolve } from "./engine/pixel";
+import { ShotCtx, drawShot, metaphorEnds, shakeAt } from "./shots";
+import { C, OUTLINE, PIXEL_FONT, SAFE, WIDTH } from "./theme";
 import type { Manifest, Scene } from "./types";
 
-const STARS = Array.from({ length: 70 }, (_, i) => ({
-  x: Math.floor(random(`x${i}`) * 135) * 8,
-  y: Math.floor(random(`y${i}`) * 240) * 8,
-  blink: Math.floor(random(`b${i}`) * 30),
-}));
+const TRANSITION = 12;
 
-const Background: React.FC = () => {
-  const frame = step(useCurrentFrame(), 6);
+const sceneStarts = (m: Manifest) =>
+  m.scenes.reduce<number[]>((acc, s, i) => [...acc, i === 0 ? 0 : acc[i - 1] + m.scenes[i - 1].durationInFrames], []);
+
+const ctxFor = (scene: Scene, local: number, fps: number): ShotCtx => ({
+  t: local / fps,
+  frame: local,
+  dur: scene.durationInFrames / fps,
+  lines: scene.lines.map((l) => ({ start: l.startFrame / fps, end: l.endFrame / fps })),
+});
+
+const renderFrame = (m: Manifest, frame: number): Buf => {
+  const starts = sceneStarts(m);
+  const i = Math.max(0, starts.filter((s) => frame >= s).length - 1);
+  const scene = m.scenes[i];
+  const local = frame - starts[i];
+  const cur = drawShot(scene.visual, ctxFor(scene, local, m.fps));
+  if (i === 0 || local >= TRANSITION) return cur;
+  const prev = m.scenes[i - 1];
+  const prevBuf = drawShot(prev.visual, ctxFor(prev, prev.durationInFrames - 1 + local, m.fps));
+  return dissolve(prevBuf, cur, local / TRANSITION);
+};
+
+const PixelStage: React.FC<{ manifest: Manifest }> = ({ manifest }) => {
+  const frame = useCurrentFrame();
+  const ref = useRef<HTMLCanvasElement>(null);
+  useLayoutEffect(() => {
+    const ctx = ref.current?.getContext("2d");
+    if (!ctx) return;
+    ctx.putImageData(new ImageData(renderFrame(manifest, frame).data, W, H), 0, 0);
+  }, [frame, manifest]);
+  const starts = sceneStarts(manifest);
+  const i = Math.max(0, starts.filter((s) => frame >= s).length - 1);
+  const scene = manifest.scenes[i];
+  const shake = shakeAt(scene.visual, ctxFor(scene, frame - starts[i], manifest.fps));
   return (
-    <AbsoluteFill style={{ background: C.bg }}>
-      {STARS.map((s, i) => (
-        <div
-          key={i}
-          style={{
-            position: "absolute",
-            left: s.x,
-            top: s.y,
-            width: 8,
-            height: 8,
-            background: C.star,
-            opacity: (frame + s.blink) % 60 < 40 ? 0.9 : 0.25,
-          }}
-        />
-      ))}
-      <AbsoluteFill
-        style={{
-          backgroundImage: "repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 4px, transparent 4px, transparent 8px)",
-        }}
-      />
-    </AbsoluteFill>
+    <canvas
+      ref={ref}
+      width={W}
+      height={H}
+      style={{
+        position: "absolute",
+        left: -24,
+        top: -24,
+        width: "calc(100% + 48px)",
+        height: "calc(100% + 48px)",
+        imageRendering: "pixelated",
+        transform: `translate(${shake.x}px, ${shake.y}px)`,
+      }}
+    />
   );
 };
 
-const Hud: React.FC<{ level: number; levels: number; progress: number }> = ({ level, levels, progress }) => (
-  <div style={{ position: "absolute", left: SAFE.left, top: SAFE.top, width: SAFE.right - SAFE.left, fontFamily: PIXEL_FONT }}>
-    <div style={{ display: "flex", justifyContent: "space-between", color: C.white, fontSize: 28 }}>
-      <span>
-        8-BIT <span style={{ color: C.yellow }}>EXPLAINS</span>
-      </span>
-      <span style={{ color: C.cold }}>
-        LV {level}/{levels}
-      </span>
-    </div>
-    <div style={{ marginTop: 18, height: 24, border: `6px solid ${C.white}`, background: C.ink }}>
-      <div style={{ height: "100%", width: `${progress * 100}%`, background: C.land }} />
+const column: React.CSSProperties = {
+  position: "absolute",
+  left: SAFE.left,
+  width: SAFE.right - SAFE.left,
+  textAlign: "center",
+  fontFamily: PIXEL_FONT,
+  color: C.white,
+};
+
+const Hud: React.FC<{ level: number; levels: number }> = ({ level, levels }) => (
+  <div style={{ ...column, top: SAFE.top + 8, fontSize: 24, textShadow: OUTLINE(3) }}>
+    8-BIT <span style={{ color: C.yellow }}>EXPLAINS</span>
+    <div style={{ display: "flex", justifyContent: "center", gap: 14, marginTop: 18 }}>
+      {Array.from({ length: levels }, (_, i) => (
+        <div key={i} style={{ width: 18, height: 18, background: i < level ? C.yellow : "transparent", border: `4px solid ${i < level ? C.ink : C.dim}` }} />
+      ))}
     </div>
   </div>
 );
 
-const Title: React.FC<{ scene: Scene }> = ({ scene }) => {
+const Headline: React.FC<{ scene: Scene }> = ({ scene }) => {
   const frame = useCurrentFrame();
-  const shown = Math.min(scene.title.length, Math.floor(frame / 2));
-  const big = scene.visual === "hook";
+  const pop = interpolate(frame, [0, 4, 7], [0.6, 1.08, 1], { extrapolateRight: "clamp" });
+  const isLevel = scene.title.startsWith("LEVEL");
+  const main = isLevel ? scene.sub : scene.title;
+  const sub = isLevel || scene.visual === "outro" ? "" : scene.sub;
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: SAFE.left,
-        top: 330,
-        width: SAFE.right - SAFE.left,
-        fontFamily: PIXEL_FONT,
-        textAlign: "center",
-      }}
-    >
-      <div style={{ color: big ? C.hot : C.yellow, fontSize: big ? 60 : 56, lineHeight: 1.3, textShadow: `6px 6px 0 ${C.ink}` }}>
-        {scene.title.slice(0, shown)}
+    <div style={{ ...column, top: 330, transform: `scale(${pop})` }}>
+      {isLevel && <div style={{ fontSize: 30, color: C.cyan, textShadow: OUTLINE(3), marginBottom: 18 }}>{scene.title}</div>}
+      <div style={{ fontSize: scene.visual === "hook" ? 64 : 54, lineHeight: 1.3, color: scene.visual === "hook" ? C.red : C.yellow, textShadow: OUTLINE(5) }}>
+        {main}
       </div>
-      {scene.sub && frame > scene.title.length * 2 && (
-        <div style={{ marginTop: 22, color: C.white, fontSize: 36, lineHeight: 1.4, textShadow: `4px 4px 0 ${C.ink}` }}>
-          {scene.sub}
-        </div>
-      )}
+      {sub && <div style={{ fontSize: 34, marginTop: 18, textShadow: OUTLINE(3) }}>{sub}</div>}
     </div>
   );
 };
 
+const CHUNK = 5;
+
 const Caption: React.FC<{ scene: Scene }> = ({ scene }) => {
   const frame = useCurrentFrame();
-  const current = [...scene.lines].reverse().find((l) => frame >= l.startFrame);
-  if (!current) return null;
-  const words = current.text.split(" ");
-  const progress = Math.min(1, (frame - current.startFrame) / Math.max(1, current.endFrame - current.startFrame));
-  const visible = Math.max(1, Math.ceil(words.length * progress));
+  const line = [...scene.lines].reverse().find((l) => frame >= l.startFrame);
+  if (!line || frame > line.endFrame + 8) return null;
+  const words = line.text.split(" ");
+  const p = Math.min(0.999, Math.max(0, (frame - line.startFrame) / Math.max(1, line.endFrame - line.startFrame)));
+  const current = Math.floor(p * words.length);
+  const from = Math.floor(current / CHUNK) * CHUNK;
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: SAFE.left,
-        top: 1190,
-        width: SAFE.right - SAFE.left,
-        minHeight: 220,
-        padding: "28px 32px",
-        boxSizing: "border-box",
-        background: C.ink,
-        border: `8px solid ${C.white}`,
-        fontFamily: PIXEL_FONT,
-        fontSize: 36,
-        lineHeight: 1.6,
-        color: C.white,
-      }}
-    >
-      {words.map((w, i) => (
-        <span key={i} style={{ opacity: i < visible ? 1 : 0 }}>
-          {w}{" "}
+    <div style={{ ...column, top: 1230, fontSize: 44, lineHeight: 1.65, textShadow: OUTLINE(4) }}>
+      {words.slice(from, from + CHUNK).map((w, i) => (
+        <span key={i}>
+          <span style={from + i === current ? { color: C.ink, background: C.yellow, textShadow: "none", padding: "0 8px" } : undefined}>{w}</span>{" "}
         </span>
       ))}
     </div>
   );
+};
+
+const Label: React.FC<{ side: "left" | "right"; top: number; children: React.ReactNode }> = ({ side, top, children }) => (
+  <div style={{ position: "absolute", top, [side]: SAFE.left, fontFamily: PIXEL_FONT, fontSize: 24, color: C.white, textShadow: OUTLINE(3) }}>{children}</div>
+);
+
+const Overlay: React.FC<{ scene: Scene; fps: number }> = ({ scene, fps }) => {
+  const frame = useCurrentFrame();
+  const l1 = scene.lines[1]?.startFrame ?? fps * 3;
+  switch (scene.visual) {
+    case "normal":
+    case "elnino": {
+      const inTub = frame / fps < metaphorEnds(ctxFor(scene, frame, fps));
+      const top = inTub ? 800 : 1140;
+      return (
+        <>
+          <Label side="left" top={top}>{inTub ? "ASIA" : "< ASIA"}</Label>
+          <Label side="right" top={top}>{inTub ? "AMERICAS" : "AMERICAS >"}</Label>
+        </>
+      );
+    }
+    case "stat": {
+      const target = parseFloat((scene.stat ?? "0").replace(/[^0-9.]/g, ""));
+      const v = interpolate(frame, [10, 60], [0, target], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+      return (
+        <div style={{ ...column, left: SAFE.left + 120, width: SAFE.right - SAFE.left - 120, top: 700, textShadow: OUTLINE(6) }}>
+          <div style={{ fontSize: 120, color: C.red }}>+{v.toFixed(1)}°C</div>
+          <div style={{ fontSize: 32, marginTop: 30, textShadow: OUTLINE(3) }}>{scene.statLabel}</div>
+        </div>
+      );
+    }
+    case "fact":
+      return frame < l1 ? null : (
+        <div style={{ ...column, top: 660, textShadow: OUTLINE(6) }}>
+          <div style={{ fontSize: 76, color: C.yellow }}>EL NIÑO</div>
+          <div style={{ fontSize: 36, marginTop: 26, textShadow: OUTLINE(3) }}>= THE LITTLE BOY</div>
+        </div>
+      );
+    case "outro":
+      return (
+        <div style={{ ...column, top: 820, textShadow: OUTLINE(4) }}>
+          <div style={{ fontSize: 40 }}>{frame < 40 ? "SAVING..." : "GAME SAVED!"}</div>
+          <div style={{ fontSize: 40, color: C.yellow, marginTop: 28 }}>@8BITEXPLAINS</div>
+        </div>
+      );
+    default:
+      return null;
+  }
 };
 
 const SceneSfx: React.FC<{ scene: Scene }> = ({ scene }) => {
@@ -121,50 +171,53 @@ const SceneSfx: React.FC<{ scene: Scene }> = ({ scene }) => {
       <Audio src={staticFile(`sfx/${name}.wav`)} volume={volume} />
     </Sequence>
   );
+  // One short SFX per scene (learnings L6): on the scene change before the first word,
+  // or after the last word in the outro; about 19 dB under the voice.
+  const lastWord = scene.lines[scene.lines.length - 1]?.endFrame ?? 40;
   switch (scene.visual) {
     case "hook":
-      return <>{[sfx("zap", 0, 0.4), sfx("thunder", 4, 0.35)]}</>;
-    case "stat":
-      return <>{[sfx("levelup", 0, 0.35), sfx("coin", 55, 0.45)]}</>;
-    case "effects":
-      return <>{[sfx("levelup", 0, 0.35), ...scene.lines.map((l) => sfx("blip", l.startFrame, 0.35))]}</>;
+      return <>{sfx("zap", 0, 0.25)}</>;
     case "outro":
-      return <>{sfx("save", 40, 0.5)}</>;
+      return <>{sfx("save", lastWord + 2, 0.25)}</>;
     default:
-      return <>{sfx("levelup", 0, 0.35)}</>;
+      return <>{sfx("blip", 0, 0.25)}</>;
   }
 };
 
-const SceneView: React.FC<{ scene: Scene }> = ({ scene }) => {
-  const frame = useCurrentFrame();
-  return (
-    <AbsoluteFill>
-      <SceneArt scene={scene} frame={frame} />
-      <Title scene={scene} />
-      <Caption scene={scene} />
-      <Audio src={staticFile(scene.audio)} />
-      <SceneSfx scene={scene} />
-    </AbsoluteFill>
-  );
+const DUCKED = 0.2;
+const OPEN = 0.42;
+const RAMP = 6;
+
+// Music volume per frame: low while anyone speaks, back up in the gaps, with short ramps.
+const musicVolume = (m: Manifest) => {
+  const starts = sceneStarts(m);
+  const speech = m.scenes.flatMap((s, i) => s.lines.map((l) => [starts[i] + l.startFrame, starts[i] + l.endFrame] as const));
+  return (f: number) => {
+    const dist = Math.min(...speech.map(([a, b]) => (f < a ? a - f : f > b ? f - b : 0)));
+    return DUCKED + (OPEN - DUCKED) * Math.min(1, dist / RAMP);
+  };
 };
 
 export const Episode: React.FC<{ manifest: Manifest }> = ({ manifest }) => {
   const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
-  const starts = manifest.scenes.reduce<number[]>((acc, s, i) => [...acc, i === 0 ? 0 : acc[i - 1] + manifest.scenes[i - 1].durationInFrames], []);
-  const current = starts.filter((s) => frame >= s).length - 1;
+  const starts = sceneStarts(manifest);
+  const current = Math.max(0, starts.filter((s) => frame >= s).length - 1);
   const levels = manifest.scenes.filter((s) => s.title.startsWith("LEVEL")).length;
-  const level = Math.min(levels, Math.max(1, manifest.scenes.slice(0, current + 1).filter((s) => s.title.startsWith("LEVEL")).length));
+  const level = manifest.scenes.slice(0, current + 1).filter((s) => s.title.startsWith("LEVEL")).length;
   return (
-    <AbsoluteFill>
-      <Background />
-      <Audio src={staticFile("sfx/music.wav")} volume={0.16} />
+    <AbsoluteFill style={{ background: C.ink, width: WIDTH }}>
+      <PixelStage manifest={manifest} />
+      <Audio src={staticFile("sfx/music.wav")} volume={musicVolume(manifest)} />
       {manifest.scenes.map((scene, i) => (
         <Sequence key={i} from={starts[i]} durationInFrames={scene.durationInFrames}>
-          <SceneView scene={scene} />
+          <Headline scene={scene} />
+          <Overlay scene={scene} fps={manifest.fps} />
+          <Caption scene={scene} />
+          <Audio src={staticFile(scene.audio)} />
+          <SceneSfx scene={scene} />
         </Sequence>
       ))}
-      <Hud level={level} levels={levels} progress={frame / durationInFrames} />
+      <Hud level={level} levels={levels} />
     </AbsoluteFill>
   );
 };

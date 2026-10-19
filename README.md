@@ -13,8 +13,11 @@ episodes/<n>-<slug>.json   script, sources, caption (written by hand / by Claude
         |
 tools/tts.py               Kokoro TTS -> remotion/public/<id>/scene-N.wav + timing manifest
 tools/chiptune.py          original chiptune music + SFX synthesized from code
+tools/mix.py               levels voice, music and SFX (pyloudnorm) for a -14 LUFS mix
         |
-remotion/                  React/Remotion template -> out/<id>.mp4
+remotion/                  pixel engine (remotion/src/engine) + shots -> out/<id>.mp4
+        |
+tools/qa.py                format, loudness, voice/background balance, contact sheet
 ```
 
 ```bash
@@ -22,7 +25,9 @@ remotion/                  React/Remotion template -> out/<id>.mp4
 ```
 
 The first run creates `tools/.venv`, downloads the Kokoro model (~350 MB) into `models/` and runs
-`npm install`. Preview and tweak with `cd remotion && npx remotion studio`.
+`npm install`. Preview and tweak with `cd remotion && npx remotion studio`. Every build ends
+with the QA report (`out/<id>-qa.md`) and contact sheet (`out/<id>-contact.png`); the
+improvement loop that uses them is described in CLAUDE.md.
 
 ## Licences of everything used
 
@@ -32,7 +37,9 @@ The first run creates `tools/.venv`, downloads the Kokoro model (~350 MB) into `
 | Music and SFX | `tools/chiptune.py` (synthesized, no samples) | our own work |
 | Video | [Remotion](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md) | free for individuals and companies of up to 3 people |
 | Font | Press Start 2P | SIL Open Font License |
-| Art | pixel sprites drawn in code (`remotion/src/pixel.tsx`) | our own work |
+| Art | pixel engine and sprites drawn in code (`remotion/src/engine/`) | our own work |
+| Map | [Natural Earth](https://www.naturalearthdata.com/) 1:110m land, rasterised by `tools/landmask.py` | public domain |
+| Loudness | [pyloudnorm](https://github.com/csteinmetz1/pyloudnorm), Pillow, SciPy | MIT / HPND / BSD |
 
 Do not swap in voices or music with NC (non-commercial) or SA terms, for example Piper's
 Turkish `dfki` voice (CC BY-NC-SA), macOS `say` voices or the Instagram music library.

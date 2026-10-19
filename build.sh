@@ -20,6 +20,7 @@ mkdir -p "$ROOT/models"
 
 "$ROOT/tools/.venv/bin/python" -I "$ROOT/tools/tts.py" "$EPISODE"
 "$ROOT/tools/.venv/bin/python" -I "$ROOT/tools/chiptune.py" "$ROOT/remotion/src/generated/$ID.json"
+"$ROOT/tools/.venv/bin/python" -I "$ROOT/tools/mix.py" "$ROOT/remotion/src/generated/$ID.json"
 
 mkdir -p "$ROOT/out"
 # Remotion's built-in static server stalls the headless browser on this machine,
@@ -32,4 +33,5 @@ SERVER=$!
 trap 'kill "$SERVER" 2>/dev/null; rm -rf "$BUNDLE"' EXIT
 sleep 1
 (cd "$ROOT/remotion" && ./node_modules/.bin/remotion render "http://127.0.0.1:$PORT" "$ID" "$ROOT/out/$ID.mp4" --codec=h264 --crf=18)
-echo "done: out/$ID.mp4"
+"$ROOT/tools/.venv/bin/python" -I "$ROOT/tools/qa.py" "$ROOT/out/$ID.mp4" "$ROOT/remotion/src/generated/$ID.json"
+echo "done: out/$ID.mp4 (QA: out/$ID-qa.md, out/$ID-contact.png)"
