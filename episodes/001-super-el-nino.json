@@ -41,7 +41,7 @@
       "visual": "stat",
       "title": "LEVEL 3",
       "sub": "THIS YEAR",
-      "stat": "+2.1 C",
+      "stat": "+2.1°C",
       "statLabel": "ABOVE NORMAL",
       "vo": [
         "Right now, part of the Pacific is two point one degrees above normal.",
@@ -70,7 +70,12 @@
       "vo": [
         "Fun fact: fishermen named it in the sixteen hundreds.",
         "It peaked near Christmas, so they called it El Niño. The little boy."
-      ]
+      ],
+      "reveal": {
+        "main": "EL NIÑO",
+        "sub": "= THE LITTLE BOY",
+        "line": 1
+      }
     },
     {
       "visual": "outro",

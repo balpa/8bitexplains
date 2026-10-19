@@ -7,6 +7,7 @@ export type Scene = {
   stat?: string;
   statLabel?: string;
   items?: string[];
+  reveal?: { main: string; sub: string; line: number };
   vo: string[];
   audio: string;
   durationInFrames: number;

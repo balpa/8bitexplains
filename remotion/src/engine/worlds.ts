@@ -37,6 +37,7 @@ export type PlanetOpts = {
   heat: number;
   t: number;
   jetLat?: number;
+  night?: number;
 };
 
 const LIGHT = (() => {
@@ -76,6 +77,7 @@ const warmth = (lat: number, lon: number, heat: number) => {
   return Math.exp(-((lat / 9) ** 2)) * Math.exp(-((wrap180(lon - centre) / (28 + heat * 18)) ** 2)) * heat;
 };
 
+const AIRGLOW = ramp(["#1f7a4a", "#7dff9a"]);
 const ICE = ramp(["#5d7fb0", "#a9c4e8", "#e6f0ff", "#ffffff"]);
 const DESERT = ramp(["#5a3a1e", "#9a6a34", "#d6a45a", "#f2d49a"]);
 
@@ -84,7 +86,7 @@ export const drawPlanet = (buf: Buf, o: PlanetOpts) => {
   const { cx, cy, r, heat, t } = o;
   const p0 = (o.lat0 ?? 0) * DEG;
   const pulse = 0.85 + 0.15 * Math.sin(t * 4);
-  const halo = R.halo;
+  const halo = (o.night ?? 0) > 0.5 ? AIRGLOW : R.halo;
   const x0 = Math.max(0, Math.floor(cx - r - 8)), x1 = Math.min(W, Math.ceil(cx + r + 8));
   const y0 = Math.max(0, Math.floor(cy - r - 8)), y1 = Math.min(H, Math.ceil(cy + r + 8));
   for (let y = y0; y < y1; y++)
@@ -103,12 +105,13 @@ export const drawPlanet = (buf: Buf, o: PlanetOpts) => {
       const latD = lat / DEG, lonD = lon / DEG;
       const px = Math.cos(lat) * Math.cos(lon), py = Math.sin(lat), pz = Math.cos(lat) * Math.sin(lon);
       const diff = Math.max(0, nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2]);
-      const shade = 0.12 + 0.88 * diff;
+      const shade = (0.12 + 0.88 * diff) * (1 - 0.72 * (o.night ?? 0));
       const tex = fbm(px * 4 + 5, py * 4, pz * 4);
       let pal = R.ocean;
       let v = shade;
-      if (Math.abs(latD) > 68 + tex * 6) pal = ICE;
-      else if (isLand(latD, lonD)) pal = Math.abs(latD) > 14 && Math.abs(latD) < 34 && tex > 0.45 ? DESERT : R.land;
+      const land = isLand(latD, lonD);
+      if ((land && Math.abs(latD) > 62 + tex * 8) || Math.abs(latD) > 80 + tex * 4) pal = ICE;
+      else if (land) pal = Math.abs(latD) > 14 && Math.abs(latD) < 34 && tex > 0.45 ? DESERT : R.land;
       else {
         const w = warmth(latD, lonD, heat);
         if (w > 0.22) {
@@ -120,6 +123,13 @@ export const drawPlanet = (buf: Buf, o: PlanetOpts) => {
       let col: RGB = pal[dither(x, y, Math.min(1, v + rim * 0.9), pal.length)];
       const cloud = smoothstep(0.7, 0.78, noise3(px * 3 + t * 0.15, py * 6, pz * 3 + 9));
       if (cloud > 0.5 && shade > 0.3) col = hex(shade > 0.7 ? "#ffffff" : "#c9d4f0");
+      const night = o.night ?? 0;
+      if (night > 0) {
+        const k = 1 - 0.78 * night;
+        col = [col[0] * k + 4 * night, col[1] * k + 6 * night, col[2] * k + 22 * night];
+        const city = land && Math.abs(latD) < 60 && fbm(px * 40, py * 40, pz * 40) > 0.7 && dither(x, y, 0.5, 2) > 0;
+        if (city && night > 0.5) col = hex(dither(x, y, 0.6, 2) ? "#ffd23f" : "#ff8a3d");
+      }
       buf.put(x, y, col);
     }
   if (o.jetLat !== undefined) {

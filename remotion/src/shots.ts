@@ -1,29 +1,16 @@
-import { Buf, clamp01, dissolve, lerp, smoothstep } from "./engine/pixel";
+import { Buf, clamp01, lerp, smoothstep } from "./engine/pixel";
 import { drawBird, drawBoat, drawFloppy, drawRainIcon, drawShimmer, drawStar, drawSunIcon, drawThermometer } from "./engine/sprites";
 import { drawTub } from "./engine/tub";
 import { PlanetOpts, drawOcean, drawPlanet, drawSpace, drawUnderwater, project } from "./engine/worlds";
+import { EP002_SHOTS } from "./shots-ep002";
+import { EP003_SHOTS } from "./shots-ep003";
+import { EP004_SHOTS, ep004Shake } from "./shots-ep004";
+import { Shot, ShotCtx, lineStart, split } from "./shot-kit";
 
-export type ShotCtx = {
-  t: number;
-  frame: number;
-  dur: number;
-  lines: { start: number; end: number }[];
-};
-
-type Shot = (buf: Buf, c: ShotCtx) => Buf | void;
-
-const lineStart = (c: ShotCtx, i: number, fallback: number) => c.lines[i]?.start ?? fallback;
+export type { ShotCtx } from "./shot-kit";
 
 // Normal and El Nino scenes switch from the bathtub metaphor to the real ocean on their second line.
 export const metaphorEnds = (c: ShotCtx) => lineStart(c, 1, 3.2) - 0.2;
-
-const split = (c: ShotCtx, at: number, a: Shot, b: Shot, width = 0.4): Buf => {
-  const k = smoothstep(at - width / 2, at + width / 2, c.t);
-  const A = new Buf(), B = new Buf();
-  if (k < 1) a(A, c);
-  if (k > 0) b(B, c);
-  return k <= 0 ? A : k >= 1 ? B : dissolve(A, B, k);
-};
 
 const SLAM = 0.35;
 
@@ -91,10 +78,12 @@ const outro: Shot = (buf, c) => {
   drawBird(buf, 118, 182 + Math.sin(c.t * 3) * 3, c.frame, true);
 };
 
-export const SHOTS: Record<string, Shot> = { hook, normal, elnino, stat, effects, fact, outro };
+export const SHOTS: Record<string, Shot> = { hook, normal, elnino, stat, effects, fact, outro, ...EP002_SHOTS, ...EP003_SHOTS, ...EP004_SHOTS };
 
 // Screen shake in output pixels: the thermometer slam in the hook.
 export const shakeAt = (visual: string, c: ShotCtx) => {
+  const other = ep004Shake(visual, c);
+  if (other) return other;
   if (visual !== "hook") return { x: 0, y: 0 };
   const k = clamp01(1 - (c.t - SLAM) / 0.4);
   if (c.t < SLAM || k <= 0) return { x: 0, y: 0 };

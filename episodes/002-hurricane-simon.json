@@ -1,0 +1,84 @@
+{
+  "id": "ep002",
+  "title": "How a hurricane gets that strong",
+  "voice": "am_michael",
+  "speed": 1.08,
+  "trend": "Hurricane Simon, Category 4 off Mexico's Pacific coast on 11 Oct 2026; Wikipedia user views x2.7 week of 12-18 Oct 2026 (tools/scout.py)",
+  "sources": [
+    "NASA Earth Observatory, Hurricane Simon Lurks Off the Mexican Coast (Oct 2026) - https://science.nasa.gov/earth/earth-observatory/hurricane-simon-lurks-off-the-mexican-coast/",
+    "NASA Space Place, How Do Hurricanes Form? - https://spaceplace.nasa.gov/hurricanes/en/"
+  ],
+  "caption": "This hurricane rippled the sky 🌀 How a storm turns warm ocean water into 250 km/h winds, in 8-bit.\n\nSources (public domain, NASA):\n- NASA Earth Observatory, Hurricane Simon Lurks Off the Mexican Coast\n- NASA Space Place, How Do Hurricanes Form?\n\nNot affiliated with or endorsed by NASA.\n\n#hurricane #weather #science #howitworks #8bit",
+  "scenes": [
+    {
+      "visual": "simon-hook",
+      "title": "HURRICANE SIMON",
+      "sub": "IT RIPPLED THE SKY",
+      "vo": [
+        "This hurricane was so strong, it sent ripples through the sky high above its own clouds.",
+        "Here's how a storm gets that powerful."
+      ]
+    },
+    {
+      "visual": "simon-fuel",
+      "title": "LEVEL 1",
+      "sub": "WARM WATER FUEL",
+      "vo": [
+        "It starts over warm ocean water near the equator.",
+        "Warm, wet air rises off the surface."
+      ]
+    },
+    {
+      "visual": "simon-chimney",
+      "title": "LEVEL 2",
+      "sub": "THE CHIMNEY",
+      "vo": [
+        "Think of a chimney.",
+        "Rising air leaves low pressure, so more air rushes in and rises too.",
+        "Its water turns into towering clouds."
+      ]
+    },
+    {
+      "visual": "simon-spin",
+      "title": "LEVEL 3",
+      "sub": "THE SPIN",
+      "vo": [
+        "Earth's rotation twists the incoming air into a counterclockwise spin.",
+        "At seventy-four miles per hour, it's a hurricane, with a calm eye in the middle."
+      ]
+    },
+    {
+      "visual": "simon-stat",
+      "title": "LEVEL 4",
+      "sub": "HURRICANE SIMON",
+      "stat": "250 KM/H",
+      "statLabel": "SUSTAINED WINDS",
+      "vo": [
+        "Simon hit about two hundred fifty kilometers per hour off Mexico's Pacific coast.",
+        "Its eye passed just fifty kilometers from shore."
+      ]
+    },
+    {
+      "visual": "simon-ripples",
+      "title": "BONUS",
+      "sub": "RIPPLES IN THE SKY",
+      "reveal": {
+        "main": "GRAVITY WAVES",
+        "sub": "SEEN FROM SPACE AT NIGHT",
+        "line": 1
+      },
+      "vo": [
+        "At night, a satellite saw ripples spreading from the storm, glowing high in the atmosphere.",
+        "Gravity waves, pushed up by its huge updrafts."
+      ]
+    },
+    {
+      "visual": "simon-outro",
+      "title": "SAVE POINT",
+      "sub": "SAVE THIS FOR STORM SEASON",
+      "vo": [
+        "Save this for storm season, and follow Eight Bit Explains."
+      ]
+    }
+  ]
+}

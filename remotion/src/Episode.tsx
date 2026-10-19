@@ -84,11 +84,11 @@ const Headline: React.FC<{ scene: Scene }> = ({ scene }) => {
   const pop = interpolate(frame, [0, 4, 7], [0.6, 1.08, 1], { extrapolateRight: "clamp" });
   const isLevel = scene.title.startsWith("LEVEL");
   const main = isLevel ? scene.sub : scene.title;
-  const sub = isLevel || scene.visual === "outro" ? "" : scene.sub;
+  const sub = isLevel || scene.visual.endsWith("outro") ? "" : scene.sub;
   return (
     <div style={{ ...column, top: 330, transform: `scale(${pop})` }}>
       {isLevel && <div style={{ fontSize: 30, color: C.cyan, textShadow: OUTLINE(3), marginBottom: 18 }}>{scene.title}</div>}
-      <div style={{ fontSize: scene.visual === "hook" ? 64 : 54, lineHeight: 1.3, color: scene.visual === "hook" ? C.red : C.yellow, textShadow: OUTLINE(5) }}>
+      <div style={{ fontSize: scene.visual.endsWith("hook") ? 64 : 54, lineHeight: 1.3, color: scene.visual.endsWith("hook") ? C.red : C.yellow, textShadow: OUTLINE(5) }}>
         {main}
       </div>
       {sub && <div style={{ fontSize: 34, marginTop: 18, textShadow: OUTLINE(3) }}>{sub}</div>}
@@ -136,33 +136,40 @@ const Overlay: React.FC<{ scene: Scene; fps: number }> = ({ scene, fps }) => {
         </>
       );
     }
-    case "stat": {
-      const target = parseFloat((scene.stat ?? "0").replace(/[^0-9.]/g, ""));
-      const v = interpolate(frame, [10, 60], [0, target], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-      return (
-        <div style={{ ...column, left: SAFE.left + 120, width: SAFE.right - SAFE.left - 120, top: 700, textShadow: OUTLINE(6) }}>
-          <div style={{ fontSize: 120, color: C.red }}>+{v.toFixed(1)}°C</div>
-          <div style={{ fontSize: 32, marginTop: 30, textShadow: OUTLINE(3) }}>{scene.statLabel}</div>
-        </div>
-      );
-    }
-    case "fact":
-      return frame < l1 ? null : (
-        <div style={{ ...column, top: 660, textShadow: OUTLINE(6) }}>
-          <div style={{ fontSize: 76, color: C.yellow }}>EL NIÑO</div>
-          <div style={{ fontSize: 36, marginTop: 26, textShadow: OUTLINE(3) }}>= THE LITTLE BOY</div>
-        </div>
-      );
-    case "outro":
-      return (
+    default:
+      break;
+  }
+  if (scene.visual.endsWith("outro"))
+    return (
         <div style={{ ...column, top: 820, textShadow: OUTLINE(4) }}>
           <div style={{ fontSize: 40 }}>{frame < 40 ? "SAVING..." : "GAME SAVED!"}</div>
           <div style={{ fontSize: 40, color: C.yellow, marginTop: 28 }}>@8BITEXPLAINS</div>
         </div>
       );
-    default:
-      return null;
+  if (scene.stat) {
+    const [, prefix, num, suffix] = scene.stat.match(/^([^0-9]*)([0-9.,]+)(.*)$/) ?? ["", "", "0", ""];
+    const decimals = (num.split(".")[1] ?? "").length;
+    const v = interpolate(frame, [10, 60], [0, parseFloat(num.replace(/,/g, ""))], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+    const shown = num.includes(",") ? Math.round(v).toLocaleString("en-US") : v.toFixed(decimals);
+    return (
+      <div style={{ ...column, left: SAFE.left + 120, width: SAFE.right - SAFE.left - 120, top: 700, textShadow: OUTLINE(6) }}>
+        <div style={{ fontSize: prefix.length + num.length + suffix.length > 9 ? 70 : prefix.length + num.length + suffix.length > 7 ? 92 : 120, color: C.red }}>
+          {prefix}
+          {shown}
+          {suffix}
+        </div>
+        <div style={{ fontSize: 32, marginTop: 30, textShadow: OUTLINE(3) }}>{scene.statLabel}</div>
+      </div>
+    );
   }
+  if (scene.reveal && frame >= (scene.lines[scene.reveal.line]?.startFrame ?? l1))
+    return (
+      <div style={{ ...column, top: 660, textShadow: OUTLINE(6) }}>
+        <div style={{ fontSize: scene.reveal.main.length > 10 ? 58 : 76, lineHeight: 1.3, color: C.yellow }}>{scene.reveal.main}</div>
+        <div style={{ fontSize: 36, marginTop: 26, textShadow: OUTLINE(3) }}>{scene.reveal.sub}</div>
+      </div>
+    );
+  return null;
 };
 
 const SceneSfx: React.FC<{ scene: Scene }> = ({ scene }) => {
@@ -175,11 +182,9 @@ const SceneSfx: React.FC<{ scene: Scene }> = ({ scene }) => {
   // or after the last word in the outro; about 19 dB under the voice.
   const lastWord = scene.lines[scene.lines.length - 1]?.endFrame ?? 40;
   switch (scene.visual) {
-    case "hook":
-      return <>{sfx("zap", 0, 0.25)}</>;
-    case "outro":
-      return <>{sfx("save", lastWord + 2, 0.25)}</>;
     default:
+      if (scene.visual.endsWith("hook")) return <>{sfx("zap", 0, 0.25)}</>;
+      if (scene.visual.endsWith("outro")) return <>{sfx("save", lastWord + 2, 0.25)}</>;
       return <>{sfx("blip", 0, 0.25)}</>;
   }
 };
@@ -207,7 +212,7 @@ export const Episode: React.FC<{ manifest: Manifest }> = ({ manifest }) => {
   return (
     <AbsoluteFill style={{ background: C.ink, width: WIDTH }}>
       <PixelStage manifest={manifest} />
-      <Audio src={staticFile("sfx/music.wav")} volume={musicVolume(manifest)} />
+      <Audio src={staticFile(`${manifest.id}/music.wav`)} volume={musicVolume(manifest)} />
       {manifest.scenes.map((scene, i) => (
         <Sequence key={i} from={starts[i]} durationInFrames={scene.durationInFrames}>
           <Headline scene={scene} />

@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 FPS = 30
 LEAD_S = 0.3
 GAP_S = 0.2
-TAIL_S = 0.6
+TAIL_S = 0.45
 
 
 def espeak_data_path() -> str:

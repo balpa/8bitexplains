@@ -108,7 +108,7 @@ def main(manifest_path: str) -> None:
     total = sum(s["durationInFrames"] for s in manifest["scenes"]) / manifest["fps"]
     out_dir = ROOT / "remotion" / "public" / "sfx"
     out_dir.mkdir(parents=True, exist_ok=True)
-    sf.write(out_dir / "music.wav", music(total).astype(np.float32), SR)
+    sf.write(ROOT / "remotion" / "public" / manifest["id"] / "music.wav", music(total).astype(np.float32), SR)
     for name, clip in sfx().items():
         sf.write(out_dir / f"{name}.wav", (0.5 * clip).astype(np.float32), SR)
     print(f"music {total:.1f}s + {len(sfx())} sfx -> {out_dir}")

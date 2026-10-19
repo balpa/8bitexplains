@@ -1,0 +1,81 @@
+{
+  "id": "ep004",
+  "title": "The tallest wave ever recorded",
+  "voice": "am_michael",
+  "speed": 1.08,
+  "trend": "Evergreen: largest wave on record (Lituya Bay, Alaska, 9 July 1958); landslide tsunamis were in the news in Oct 2026",
+  "sources": [
+    "USGS, Lituya Bay, 1958 (image and description) - https://www.usgs.gov/media/images/lituya-bay-1958",
+    "USGS Professional Paper 354-C, Miller (1960), Giant Waves in Lituya Bay, Alaska - https://pubs.usgs.gov/pp/0354c/report.pdf"
+  ],
+  "caption": "1,720 feet. The tallest wave on record 🌊 How a rockslide in an Alaskan bay launched it, in 8-bit.\n\nSources (public domain, USGS):\n- USGS, Lituya Bay, 1958\n- USGS Professional Paper 354-C, Giant Waves in Lituya Bay, Alaska\n\nNot affiliated with or endorsed by the USGS.\n\n#tsunami #alaska #earthscience #howitworks #8bit",
+  "scenes": [
+    {
+      "visual": "wave-hook",
+      "title": "TALLEST WAVE EVER",
+      "sub": "1958, ALASKA",
+      "vo": [
+        "The tallest wave on record didn't hit a beach.",
+        "It climbed a mountain."
+      ]
+    },
+    {
+      "visual": "wave-bay",
+      "title": "LEVEL 1",
+      "sub": "LITUYA BAY",
+      "vo": [
+        "This is Lituya Bay in Alaska, a narrow inlet walled in by steep mountains."
+      ]
+    },
+    {
+      "visual": "wave-quake",
+      "title": "LEVEL 2",
+      "sub": "THE QUAKE",
+      "vo": [
+        "On July ninth, nineteen fifty-eight, a powerful earthquake struck along the Fairweather fault."
+      ]
+    },
+    {
+      "visual": "wave-slide",
+      "title": "LEVEL 3",
+      "sub": "THE ROCKSLIDE",
+      "vo": [
+        "It shook a huge chunk of cliff loose at the head of the bay.",
+        "Imagine dropping a brick into a full bathtub.",
+        "The water has nowhere to go, except up."
+      ]
+    },
+    {
+      "visual": "wave-stat",
+      "title": "LEVEL 4",
+      "sub": "THE SURGE",
+      "stat": "1,720 FT",
+      "statLabel": "524 METERS HIGH",
+      "vo": [
+        "The water surged up the opposite slope and stripped the forest away, as high as one thousand seven hundred twenty feet.",
+        "That's about five hundred twenty-four meters."
+      ]
+    },
+    {
+      "visual": "wave-inland",
+      "title": "BONUS",
+      "sub": "HOW FAR IT REACHED",
+      "reveal": {
+        "main": "3,600 FT INLAND",
+        "sub": "FROM THE HIGH-TIDE LINE",
+        "line": 0
+      },
+      "vo": [
+        "In places, it tore through the forest three thousand six hundred feet inland."
+      ]
+    },
+    {
+      "visual": "wave-outro",
+      "title": "SAVE POINT",
+      "sub": "SAVE THIS ONE",
+      "vo": [
+        "Save this, and follow Eight Bit Explains for more."
+      ]
+    }
+  ]
+}

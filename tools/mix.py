@@ -69,10 +69,9 @@ def main(manifest_path: str) -> None:
     manifest = json.loads(Path(manifest_path).read_text())
     public = ROOT / "remotion" / "public"
     mix_voice([public / s["audio"] for s in manifest["scenes"]])
-    mix_music(public / "sfx" / "music.wav")
+    mix_music(public / manifest["id"] / "music.wav")
     for p in sorted((public / "sfx").glob("*.wav")):
-        if p.name != "music.wav":
-            mix_sfx(p)
+        mix_sfx(p)
     print("sfx: low-passed and peak-normalised")
 
 

@@ -1,0 +1,79 @@
+{
+  "id": "ep003",
+  "title": "How Artemis II got home from the Moon",
+  "voice": "am_michael",
+  "speed": 1.08,
+  "trend": "NASA named Artemis II astronaut Christina Koch acting deputy chief engineer (Oct 2026); Wikipedia user views x1.7 week of 12-18 Oct 2026 (tools/scout.py)",
+  "sources": [
+    "NASA, NASA Names Astronaut Christina Koch Acting Deputy Chief Engineer - https://www.nasa.gov/news-release/nasa-names-astronaut-christina-koch-acting-deputy-chief-engineer/",
+    "NASA, NASA's Artemis II Crew Eclipses Record for Farthest Human Spaceflight - https://www.nasa.gov/news-release/nasas-artemis-ii-crew-eclipses-record-for-farthest-human-spaceflight/",
+    "NASA, Artemis II Flight Day 6: Crew Wraps Historic Lunar Flyby - https://www.nasa.gov/blogs/missions/2026/04/06/artemis-ii-flight-day-6-crew-wraps-historic-lunar-flyby/",
+    "NASA, Artemis II Press Kit (translunar injection and free-return trajectory) - https://www.nasa.gov/artemis-ii-press-kit/"
+  ],
+  "caption": "One push to the Moon, and gravity drove them home 🌕 How Artemis II's free-return trajectory works, in 8-bit.\n\nSources (public domain, NASA):\n- NASA, Artemis II Crew Eclipses Record for Farthest Human Spaceflight\n- NASA, Artemis II Flight Day 6\n- NASA, Artemis II Press Kit\n- NASA, Christina Koch named Acting Deputy Chief Engineer\n\nNot affiliated with or endorsed by NASA.\n\n#artemis #moon #space #howitworks #8bit",
+  "scenes": [
+    {
+      "visual": "moon-hook",
+      "title": "AROUND THE MOON",
+      "sub": "WITH ONE BIG PUSH",
+      "vo": [
+        "Four astronauts flew around the Moon this year, and gravity drove them home.",
+        "One of them, Christina Koch, was just named NASA's acting deputy chief engineer."
+      ]
+    },
+    {
+      "visual": "moon-push",
+      "title": "LEVEL 1",
+      "sub": "ONE BIG PUSH",
+      "vo": [
+        "Their Orion capsule fired its engine one last big time, aimed at the Moon."
+      ]
+    },
+    {
+      "visual": "moon-wells",
+      "title": "LEVEL 2",
+      "sub": "GRAVITY WELLS",
+      "vo": [
+        "Picture space as a stretchy sheet.",
+        "Earth and the Moon press dips into it, and Orion rolls toward the Moon like a marble."
+      ]
+    },
+    {
+      "visual": "moon-slingshot",
+      "title": "LEVEL 3",
+      "sub": "FREE RETURN",
+      "vo": [
+        "It swings around the far side, and the Moon's pull bends its path back toward Earth.",
+        "No big burn needed. That's a free-return trajectory."
+      ]
+    },
+    {
+      "visual": "moon-stat",
+      "title": "LEVEL 4",
+      "sub": "NEW RECORD",
+      "stat": "252,756 MI",
+      "statLabel": "FARTHEST HUMANS HAVE FLOWN",
+      "vo": [
+        "At their farthest, they were two hundred fifty-two thousand miles from Earth.",
+        "That beat Apollo thirteen's record from nineteen seventy."
+      ]
+    },
+    {
+      "visual": "moon-blackout",
+      "title": "BONUS",
+      "sub": "BEHIND THE MOON",
+      "reveal": { "main": "NO SIGNAL", "sub": "FOR ABOUT 40 MINUTES", "line": 0 },
+      "vo": [
+        "Behind the Moon, they lost contact with Earth for about forty minutes."
+      ]
+    },
+    {
+      "visual": "moon-outro",
+      "title": "SAVE POINT",
+      "sub": "SAVE THIS FOR LAUNCH DAY",
+      "vo": [
+        "Save this, and follow Eight Bit Explains for more."
+      ]
+    }
+  ]
+}
