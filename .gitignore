@@ -7,3 +7,5 @@ remotion/public/sfx/
 remotion/src/generated/
 out/
 __pycache__/
+.superpowers/
+plan.md
