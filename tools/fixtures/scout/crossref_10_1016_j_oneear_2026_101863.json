@@ -1,0 +1,65 @@
+{
+ "status": "ok",
+ "message-type": "work",
+ "message": {
+  "DOI": "10.1016/j.oneear.2026.101863",
+  "title": [
+   "Demand-side strategies unlock gigaton-scale GHG mitigation beyond supply-side limits in the global lithium-ion battery supply chain"
+  ],
+  "publisher": "Elsevier BV",
+  "container-title": [
+   "One Earth"
+  ],
+  "license": [
+   {
+    "start": {
+     "date-parts": [
+      [
+       2026,
+       10,
+       1
+      ]
+     ],
+     "date-time": "2026-10-01T00:00:00Z",
+     "timestamp": 1790812800000
+    },
+    "content-version": "tdm",
+    "delay-in-days": 0,
+    "URL": "https://www.elsevier.com/tdm/userlicense/1.0/"
+   },
+   {
+    "start": {
+     "date-parts": [
+      [
+       2026,
+       10,
+       1
+      ]
+     ],
+     "date-time": "2026-10-01T00:00:00Z",
+     "timestamp": 1790812800000
+    },
+    "content-version": "tdm",
+    "delay-in-days": 0,
+    "URL": "https://www.elsevier.com/legal/tdmrep-license"
+   },
+   {
+    "start": {
+     "date-parts": [
+      [
+       2026,
+       9,
+       23
+      ]
+     ],
+     "date-time": "2026-09-23T00:00:00Z",
+     "timestamp": 1790121600000
+    },
+    "content-version": "vor",
+    "delay-in-days": 0,
+    "URL": "http://creativecommons.org/licenses/by/4.0/"
+   }
+  ],
+  "URL": "https://doi.org/10.1016/j.oneear.2026.101863"
+ }
+}

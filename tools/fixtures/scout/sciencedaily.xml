@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+	<channel>
+		<title>All Top News -- ScienceDaily</title>
+		<link>https://www.sciencedaily.com/news/top/</link>
+		<description>Top science stories featured on ScienceDaily&#039;s home page.</description>
+		<language>en-us</language>
+		<pubDate>Mon, 19 Oct 2026 09:09:51 EDT</pubDate>
+		<lastBuildDate>Mon, 19 Oct 2026 09:09:51 EDT</lastBuildDate>
+		<ttl>60</ttl>
+		<image>
+			<title>All Top News -- ScienceDaily</title>
+			<url>https://www.sciencedaily.com/images/scidaily-logo-rss.png</url>
+			<link>https://www.sciencedaily.com/news/top/</link>
+			<description>For more science news, visit ScienceDaily.</description>
+		</image>
+		<atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="self" href="https://www.sciencedaily.com/rss/top.xml" type="application/rss+xml" />
+		<item>
+			<title>Just 3,000 steps a day may help slow Alzheimer&#039;s, scientists find</title>
+			<link>https://www.sciencedaily.com/releases/2026/10/261018205058.htm</link>
+			<description>(trimmed)</description>
+			<pubDate>Mon, 19 Oct 2026 07:23:26 EDT</pubDate>
+			<guid isPermaLink="true">https://www.sciencedaily.com/releases/2026/10/261018205058.htm</guid>
+		</item>
+<item>
+			<title>Alaska’s monster tsunami sent water 1,580 feet up a mountain</title>
+			<link>https://www.sciencedaily.com/releases/2026/10/261018205047.htm</link>
+			<description>(trimmed)</description>
+			<pubDate>Mon, 19 Oct 2026 09:09:18 EDT</pubDate>
+			<guid isPermaLink="true">https://www.sciencedaily.com/releases/2026/10/261018205047.htm</guid>
+		</item>
+<item>
+			<title>Why some people escape Alzheimer’s despite carrying a high-risk gene</title>
+			<link>https://www.sciencedaily.com/releases/2026/10/261018205044.htm</link>
+			<description>(trimmed)</description>
+			<pubDate>Mon, 19 Oct 2026 08:57:02 EDT</pubDate>
+			<guid isPermaLink="true">https://www.sciencedaily.com/releases/2026/10/261018205044.htm</guid>
+		</item>
+<item>
+			<title>Something strange is happening beneath a volcano near 2 million people</title>
+			<link>https://www.sciencedaily.com/releases/2026/10/261018205039.htm</link>
+			<description>(trimmed)</description>
+			<pubDate>Mon, 19 Oct 2026 08:35:09 EDT</pubDate>
+			<guid isPermaLink="true">https://www.sciencedaily.com/releases/2026/10/261018205039.htm</guid>
+		</item>
+<item>
+			<title>Scientists win 2026 Nobel Prize for controlling brain cells with light</title>
+			<link>https://www.sciencedaily.com/releases/2026/10/261018205037.htm</link>
+			<description>(trimmed)</description>
+			<pubDate>Mon, 19 Oct 2026 06:02:32 EDT</pubDate>
+			<guid isPermaLink="true">https://www.sciencedaily.com/releases/2026/10/261018205037.htm</guid>
+		</item>
+</channel>
+</rss>

@@ -1,0 +1,49 @@
+{
+ "status": "ok",
+ "message-type": "work",
+ "message": {
+  "DOI": "10.1038/d41586-025-03596-2",
+  "title": [
+   "Alzheimer\u2019s decline slows with just a few thousand steps a day"
+  ],
+  "publisher": "Springer Science and Business Media LLC",
+  "container-title": [
+   "Nature"
+  ],
+  "license": [
+   {
+    "start": {
+     "date-parts": [
+      [
+       2025,
+       11,
+       3
+      ]
+     ],
+     "date-time": "2025-11-03T00:00:00Z",
+     "timestamp": 1762128000000
+    },
+    "content-version": "tdm",
+    "delay-in-days": 0,
+    "URL": "https://www.springernature.com/gp/researchers/text-and-data-mining"
+   },
+   {
+    "start": {
+     "date-parts": [
+      [
+       2025,
+       11,
+       3
+      ]
+     ],
+     "date-time": "2025-11-03T00:00:00Z",
+     "timestamp": 1762128000000
+    },
+    "content-version": "vor",
+    "delay-in-days": 0,
+    "URL": "https://www.springernature.com/gp/researchers/text-and-data-mining"
+   }
+  ],
+  "URL": "https://doi.org/10.1038/d41586-025-03596-2"
+ }
+}

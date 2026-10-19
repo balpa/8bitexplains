@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:media="http://search.yahoo.com/mrss/" >
+<channel>
+	<title>NASA</title>
+	<atom:link href="https://www.nasa.gov/news-release/feed/" rel="self" type="application/rss+xml" />
+	<link>https://www.nasa.gov</link>
+	<description>Official National Aeronautics and Space Administration Website</description>
+	<lastBuildDate>Mon, 19 Oct 2026 16:53:30 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=7.0.7</generator>
+	<item>
+		<title>Instrumentation</title>
+		<link>https://www.nasa.gov/centers-and-facilities/glenn/acoustics-instrumentation/</link>
+		<dc:creator><![CDATA[L. Danielle Koch]]></dc:creator>
+		<pubDate>Mon, 19 Oct 2026 16:37:45 +0000</pubDate>
+				<guid isPermaLink="false">https://www.nasa.gov/?p=1052279</guid>
+					<description>(trimmed)</description>
+			</item>
+<item>
+		<title>Martian Dawn</title>
+		<link>https://www.nasa.gov/image-article/martian-dawn/</link>
+		<dc:creator><![CDATA[HQ Web Team]]></dc:creator>
+		<pubDate>Mon, 19 Oct 2026 16:03:51 +0000</pubDate>
+				<guid isPermaLink="false">https://www.nasa.gov/?post_type=image-article&#038;p=1057094</guid>
+					<description>(trimmed)</description>
+			</item>
+<item>
+		<title>APOD: 2026 October 19 – Treble Clef: Unusual X-ray Hot Radio Source</title>
+		<link>https://science.nasa.gov/image-article/apod-2026-october-19-treble-clef-unusual-x-ray-hot-radio-source/</link>
+		<dc:creator><![CDATA[]]></dc:creator>
+		<pubDate>Mon, 19 Oct 2026 04:05:00 +0000</pubDate>
+				<guid isPermaLink="false">https://science.nasa.gov/image-article/apod-2026-october-19-treble-clef-unusual-x-ray-hot-radio-source/</guid>
+					<description>(trimmed)</description>
+			</item>
+<item>
+		<title>Autumn Paints Poland’s Bieszczady Mountains</title>
+		<link>https://science.nasa.gov/earth/earth-observatory/autumn-paints-polands-bieszczady-mountains/</link>
+		<dc:creator><![CDATA[]]></dc:creator>
+		<pubDate>Mon, 19 Oct 2026 04:01:00 +0000</pubDate>
+				<guid isPermaLink="false">https://science.nasa.gov/earth/earth-observatory/autumn-paints-polands-bieszczady-mountains/</guid>
+					<description>(trimmed)</description>
+			</item>
+<item>
+		<title>APOD: 2026 October 18 – Sonified: Eagle Nebula Pillars</title>
+		<link>https://science.nasa.gov/image-article/apod-2026-october-18-sonified-eagle-nebula-pillars/</link>
+		<dc:creator><![CDATA[]]></dc:creator>
+		<pubDate>Sun, 18 Oct 2026 04:05:00 +0000</pubDate>
+				<guid isPermaLink="false">https://science.nasa.gov/image-article/apod-2026-october-18-sonified-eagle-nebula-pillars/</guid>
+					<description>(trimmed)</description>
+			</item>
+<item>
+		<title>APOD: 2026 October 17 – 3D 67P</title>
+		<link>https://science.nasa.gov/image-article/apod-2026-october-17-3d-67p/</link>
+		<dc:creator><![CDATA[]]></dc:creator>
+		<pubDate>Sat, 17 Oct 2026 04:05:00 +0000</pubDate>
+				<guid isPermaLink="false">https://science.nasa.gov/image-article/apod-2026-october-17-3d-67p/</guid>
+					<description>(trimmed)</description>
+			</item>
+</channel>
+</rss>
