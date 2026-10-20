@@ -2,6 +2,13 @@
 
 Raw feedback from the owner, newest first, with what was changed in response.
 
+## 2026-10-20 · improvement plan (docs/research/improvement-plan.md)
+
+- Asked what could be improved in the videos, then: "do whatever research is needed". ->
+  growth-and-data.md, audio.md, visual-craft.md, improvement-plan.md
+- Approved the proposed order of work: QA guards and cover first, then posting and data, then
+  audio, then visuals. -> docs/status.md, docs/publishing/posting-checklist.md
+
 ## 2026-10-20 · ep005-ep007 v1 (Lake Nyos, solar superstorm, lightning)
 
 - "Not bad, we are making progress, but we still have a long way to go."
