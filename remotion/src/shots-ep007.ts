@@ -53,7 +53,9 @@ const strike: Shot = (buf, c) => {
 
 const heat: Shot = (buf, c) => {
   const l1 = lineStart(c, 1, 3), l2 = lineStart(c, 2, 9);
-  drawChannel(buf, c.t, lerp(0.35, 1, smoothstep(l1, l2 - 0.3, c.t)), smoothstep(l2 - 0.3, l2 + 0.4, c.t));
+  const into = smoothstep(l1, l2 - 0.3, c.t), out = smoothstep(l2 - 0.3, l2 + 0.5, c.t);
+  const cam = { x: lerp(lerp(90, 36, into), 96, out), y: lerp(lerp(160, 140, into), 196, out), zoom: lerp(lerp(1, 2.4, into), 1.2, out) };
+  drawChannel(buf, c.t, lerp(0.35, 1, into), smoothstep(l2 - 0.3, l2 + 0.4, c.t), cam);
 };
 
 const fire: Shot = (buf, c) => drawPrairie(buf, { t: c.t, forest: smoothstep(0, 2.2, c.t), flash: flashAt(c.t, 0.1) * 0.6 });

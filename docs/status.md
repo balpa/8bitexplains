@@ -20,8 +20,9 @@ Read this first when resuming on another machine. Updated 2026-10-20.
    - cover generator `remotion/src/Cover.tsx` plus `tools/covers.py` grid preview (L20);
    - camera moves fixing the flagged stills in ep005 (hook, soda), ep006 (shield), ep007 (hook,
      heat); caption question first (L22).
-   - Still open: re-render ep005-ep007 with all of this, check QA and contact sheets, send the
-     owner MP4, contact sheet and cover.
+   - ep005-ep007 re-rendered on 2026-10-20 and sent: all QA checks pass, longest stills 1.0 s,
+     3.5 s and 2.5 s. ep007 keeps the 19-token line "That bang is thunder." (the longer version
+     ran 60.3 s). Ready to post.
 2. **Owner posts** ep005-ep007 with the checklist; `docs/data/posts.csv` starts.
 3. **Audio arc** (Priority 3), then **visual craft** (Priority 4), one at a time, checked against
    the data.

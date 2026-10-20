@@ -89,6 +89,10 @@ class QaTest(unittest.TestCase):
         self.assertEqual(qa.long_holds(h, until_s=6.0, fps=2), [(0.5, 4.5)])
         self.assertEqual(qa.long_holds(np.full(10, 0.5), until_s=5.0, fps=2), [])
 
+    def test_long_holds_report_the_longest_hold_inside_a_still_stretch(self):
+        h = np.array([4.0, 5.0, 4.5, 4.0, 3.5, 3.0, 2.5, 2.0, 1.5, 1.0, 0.5, 0.0, 0.0, 0.0])
+        self.assertEqual(qa.long_holds(h, until_s=7.0, fps=2), [(0.5, 5.0)])
+
     def test_long_holds_cut_a_still_at_the_save_point(self):
         h = np.array([0.0, 0.0, 6.0, 5.5, 5.0])
         self.assertEqual(qa.long_holds(h, until_s=2.0, fps=2), [])

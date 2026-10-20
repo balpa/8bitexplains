@@ -132,14 +132,16 @@ def holds(frames: np.ndarray, fps: float = HOLD_FPS, change: float = HOLD_CHANGE
 
 def long_holds(h: np.ndarray, until_s: float, fps: float = HOLD_FPS, warn_s: float = HOLD_WARN_S) -> list[tuple[float, float]]:
     """(start, seconds) of each still stretch of warn_s or more that starts before until_s (the save point is exempt)."""
+    length = [min(h[t], until_s - t / fps) for t in range(len(h)) if t / fps < until_s]
     out, t = [], 0
-    while t < len(h) and t / fps < until_s:
-        length = min(h[t], until_s - t / fps)
-        if length >= warn_s:
-            out.append((t / fps, length))
-            t += int(h[t] * fps) + 1
-        else:
+    while t < len(length):
+        if length[t] < warn_s:
             t += 1
+            continue
+        end = t + int(length[t] * fps)
+        best = max(range(t, min(end, len(length) - 1) + 1), key=lambda k: length[k])
+        out.append((best / fps, length[best]))
+        t = best + int(length[best] * fps) + 1
     return out
 
 

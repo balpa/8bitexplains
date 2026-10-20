@@ -211,24 +211,29 @@ export const drawBalloon = (buf: Buf, t: number, pop: number, grow = 1) => {
 };
 
 // Extreme close-up of a lightning channel next to the Sun for scale of heat.
-export const drawChannel = (buf: Buf, t: number, heat: number, sunK: number) => {
-  shadeAll(buf, (x, y) => pick(ramp(["#05030c", "#0e0820", "#1a0e34", "#2a1448"]), x, y, 0.25 + 0.5 * clamp01(1 - Math.abs(x - 30) / 120) * heat + noise3(x * 0.05, y * 0.05, t) * 0.15));
+export const drawChannel = (buf: Buf, t: number, heat: number, sunK: number, cam: Camera = { x: W / 2, y: H / 2, zoom: 1 }) => {
+  shadeAll(buf, (sx, sy) => {
+    const { x, y } = toWorld(cam, sx, sy);
+    return pick(ramp(["#05030c", "#0e0820", "#1a0e34", "#2a1448"]), sx, sy, 0.25 + 0.5 * clamp01(1 - Math.abs(x - 30) / 120) * heat + noise3(x * 0.05, y * 0.05, t) * 0.15);
+  });
   const path = (y: number) => 30 + 6 * Math.sin(y / 23 + 1) + 3 * Math.sin(y / 7 + t * 0.5) + 2 * noise3(y * 0.2, t * 3, 1);
-  shadeAll(buf, (x, y) => {
+  shadeAll(buf, (sx, sy) => {
+    const { x, y } = toWorld(cam, sx, sy);
     const d = Math.abs(x - path(y));
     const shimmer = 2 * Math.sin(y * 0.6 - t * 14) * heat;
     if (d < 2.4) return hex("#ffffff");
-    if (d < 5) return pick(ramp(["#9ad4ff", "#e6f6ff"]), x, y, 1 - (d - 2.4) / 2.6);
-    if (d < 18 + shimmer) return cover(x, y, (1 - d / 20) * heat) ? (d < 10 ? hex("#b8a0ff") : hex("#6a4ad0")) : null;
+    if (d < 5) return pick(ramp(["#9ad4ff", "#e6f6ff"]), sx, sy, 1 - (d - 2.4) / 2.6);
+    if (d < 18 + shimmer) return cover(sx, sy, (1 - d / 20) * heat) ? (d < 10 ? hex("#b8a0ff") : hex("#6a4ad0")) : null;
     return null;
   });
   if (sunK > 0) {
-    const sx = 140, sy = 230, sr = 18;
-    shadeAll(buf, (x, y) => {
-      const d = Math.hypot(x - sx, y - sy) / sr;
-      if (d < 1) return pick(ramp(["#8f1810", "#d0401a", "#ff7a2a", "#ffb347"]), x, y, (0.3 + 0.6 * Math.sqrt(1 - d * d)) * sunK);
-      return d < 1.4 && cover(x, y, (1.4 - d) * sunK) ? hex("#8f3a1a") : null;
-    }, sx - sr * 1.5, sy - sr * 1.5, sx + sr * 1.5, sy + sr * 1.5);
+    const cx = 140, cy = 230, sr = 18;
+    shadeAll(buf, (sx, sy) => {
+      const { x, y } = toWorld(cam, sx, sy);
+      const d = Math.hypot(x - cx, y - cy) / sr;
+      if (d < 1) return pick(ramp(["#8f1810", "#d0401a", "#ff7a2a", "#ffb347"]), sx, sy, (0.3 + 0.6 * Math.sqrt(1 - d * d)) * sunK);
+      return d < 1.4 && cover(sx, sy, (1.4 - d) * sunK) ? hex("#8f3a1a") : null;
+    });
   }
 };
 
