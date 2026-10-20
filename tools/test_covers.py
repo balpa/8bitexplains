@@ -30,5 +30,19 @@ class CoversTest(unittest.TestCase):
             self.assertEqual(sheet.getpixel((180, 5)), (255, 0, 0))
 
 
+    def test_grid_preview_wraps_to_a_second_row_after_three_covers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            paths = []
+            for n, colour in enumerate([(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]):
+                path = out / f"cover{n}.png"
+                Image.new("RGB", (1080, 1920), colour).save(path)
+                paths.append(path)
+            covers.grid_preview(paths, out / "grid.png")
+            sheet = Image.open(out / "grid.png")
+            self.assertEqual(sheet.size, (1080, 960))
+            self.assertEqual(sheet.getpixel((180, 485)), (255, 255, 0))
+
+
 if __name__ == "__main__":
     unittest.main()
