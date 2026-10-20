@@ -2,6 +2,7 @@
 
 Faceless Instagram Reels / TikTok channel: ~50 s English science explainers in an 8-bit style,
 aiming for "Kurzgesagt, but 8-bit". Pipeline and licences are in README.md.
+Current state and the agreed next steps are in docs/status.md; read it when resuming.
 
 ## Working with the owner
 

@@ -29,21 +29,23 @@
 
 ## Captions
 
-- No caption box. Centred, outlined text, 3-7 words on screen at a time, current word
-  highlighted. Positioned around y 1250-1420.
-- Headline per scene: one short line, centred, near the top of the safe zone.
+- No caption box. Centred, outlined text at 48 px, 3-7 words on screen at a time, current word
+  highlighted. Positioned around y 1250-1420 (to be checked on a phone with a real post; Meta's ad
+  spec keeps the bottom 35%, from y 1248, clear).
+- Headline per scene: one short line at 48 px (hook 72 px), centred, near the top of the safe
+  zone. Besides the captions only one text block is visible at a time (learnings L19).
 
 ## Audio
 
-- Voice: Kokoro `am_michael`, speed ~1.08.
+- Voice: Kokoro `am_michael`, speed 1.18-1.2 (episodes 001-004 used 1.08).
 - Target final loudness about -14 LUFS integrated, true peak below -1 dBTP.
 - Music 15-18 dB under the voice while it speaks (ducked), rising between lines.
 - SFX are seasoning: short, soft, at least 10 dB under the voice, never on top of a word.
 
 ## Pacing
 
-- 45-55 s (60 s hard maximum). Follow the second-by-second blueprint in
-  docs/research/retention-research.md (learnings L15).
+- 55-60 s (60 s hard maximum) so the causal chain fits (learnings L16). Follow the
+  second-by-second blueprint in docs/research/retention-research.md (learnings L15).
 - Structure, each scene tagged with `beat`: hook (0-3 s, number plus question), how it works
   (one cause per shot), payoff and re-hook (before 20 s), peak (30-42 s, the surprising number at
   human scale), answer, aftermath (consequences, L11), takeaway plus save point (1 s or less).

@@ -22,6 +22,13 @@ FIRST_WORD_MAX_S = 0.35
 WPM_RANGE = (160.0, 200.0)
 CTA_PAUSE_S = 0.8
 SHEET_EVERY_S = 2.5
+HOLD_FPS = 2
+HOLD_CROP = (0, 0, 1080, 1180)
+HOLD_CELLS = (45, 49)
+HOLD_CHANGE = 0.20
+HOLD_WARN_S = 3.0
+HOLD_FAIL_S = 4.0
+MIN_LINE_TOKENS = 20
 
 
 def tool(name: str, *args: str) -> str:
@@ -99,6 +106,45 @@ def script_checks(manifest: dict) -> list[tuple[str, bool]]:
     ]
 
 
+def short_lines(manifest: dict) -> list[str]:
+    """Kokoro reads lines under about 20 phoneme tokens weakly (VOICES.md); tts.py stores the count."""
+    return [l["text"] for s in manifest["scenes"] for l in s["lines"] if l.get("tokens", MIN_LINE_TOKENS) < MIN_LINE_TOKENS]
+
+
+def motion_frames(mp4: Path) -> np.ndarray:
+    """Grey frames at HOLD_FPS without the caption band, box-averaged so star and rain sparkle cancels out."""
+    with tempfile.TemporaryDirectory() as tmp:
+        tool("ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(mp4), "-r", str(HOLD_FPS), str(Path(tmp) / "f%04d.png"))
+        return np.array([np.asarray(Image.open(p).convert("L").crop(HOLD_CROP).resize(HOLD_CELLS, Image.BOX), float) for p in sorted(Path(tmp).glob("f*.png"))])
+
+
+def holds(frames: np.ndarray, fps: float = HOLD_FPS, change: float = HOLD_CHANGE) -> np.ndarray:
+    """Seconds each frame's picture lasts before a later frame differs from it; per-frame normalising ignores flashes."""
+    z = (frames - frames.mean(axis=(1, 2), keepdims=True)) / (frames.std(axis=(1, 2), keepdims=True) + 1e-6)
+    out = np.zeros(len(z))
+    for t in range(len(z)):
+        k = t
+        while k + 1 < len(z) and np.abs(z[k + 1] - z[t]).mean() < change:
+            k += 1
+        out[t] = (k - t) / fps
+    return out
+
+
+def long_holds(h: np.ndarray, until_s: float, fps: float = HOLD_FPS, warn_s: float = HOLD_WARN_S) -> list[tuple[float, float]]:
+    """(start, seconds) of each still stretch of warn_s or more that starts before until_s (the save point is exempt)."""
+    length = [min(h[t], until_s - t / fps) for t in range(len(h)) if t / fps < until_s]
+    out, t = [], 0
+    while t < len(length):
+        if length[t] < warn_s:
+            t += 1
+            continue
+        end = t + int(length[t] * fps)
+        best = max(range(t, min(end, len(length) - 1) + 1), key=lambda k: length[k])
+        out.append((best / fps, length[best]))
+        t = best + int(length[best] * fps) + 1
+    return out
+
+
 def grid(count: int, cols: int) -> tuple[int, int]:
     return cols, (count + cols - 1) // cols
 
@@ -132,6 +178,11 @@ def main(mp4_path: str, manifest_path: str) -> int:
     lufs = pyln.Meter(sr).integrated_loudness(audio)
     peak = true_peak_db(audio)
     balance = scene_balance(manifest, audio.mean(axis=1), sr)
+    outro_s = sum(s["durationInFrames"] for s in manifest["scenes"][:-1]) / manifest["fps"]
+    h = holds(motion_frames(mp4))
+    stills = long_holds(h, outro_s)
+    longest = max((min(d, outro_s - t / HOLD_FPS) for t, d in enumerate(h) if t / HOLD_FPS < outro_s), default=0.0)
+    weak = short_lines(manifest)
 
     checks = [
         ("format 1080x1920 @30 fps, h264 + aac", info["width"] == 1080 and info["height"] == 1920 and round(info["fps"]) == 30 and info["video"] == "h264" and info["audio"] == "aac"),
@@ -140,12 +191,16 @@ def main(mp4_path: str, manifest_path: str) -> int:
         (f"true peak {peak:.1f} dBTP below {TRUE_PEAK_MAX}", peak < TRUE_PEAK_MAX),
         (f"voice >= {MIN_SPEECH_OVER_GAP_DB:.0f} dB over background in every scene", all(r["ok"] for r in balance)),
         *script_checks(manifest),
+        (f"no picture holds over {HOLD_FAIL_S:.0f}s before the save point (longest {longest:.1f}s)", longest <= HOLD_FAIL_S),
     ]
     sheet = mp4.with_name(f"{ep}-contact.png")
     contact_sheet(mp4, info["duration"], sheet)
 
     lines = [f"# QA {ep}", "", *[f"- [{'x' if ok else ' '}] {name}" for name, ok in checks], "", "| scene | visual | speech dB | gap dB | ok |", "|---|---|---|---|---|"]
     lines += [f"| {r['scene']} | {r['visual']} | {r['speech_db']:.1f} | {r['gap_db']:.1f} | {'yes' if r['ok'] else 'NO'} |" for r in balance]
+    warnings = [f"picture holds {d:.1f}s from {t:.1f}s" for t, d in stills] + [f"short line, Kokoro may read it weakly: {text!r}" for text in weak]
+    if warnings:
+        lines += ["", "Warnings:", *[f"- {w}" for w in warnings]]
     lines += ["", f"Contact sheet: {sheet.name}. Now do the by-eye half of docs/style/review-checklist.md."]
     report = mp4.with_name(f"{ep}-qa.md")
     report.write_text("\n".join(lines) + "\n")

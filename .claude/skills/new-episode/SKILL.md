@@ -21,12 +21,13 @@ Read docs/style/style-guide.md and docs/style/learnings.md first. Every rule the
    scene pick the shot and what changes on screen every 2-3 s. Make the last frame rhyme with the
    first. Write new area renderers at fine detail (L14: `+= PX` loops and `buf.dot`).
 4. **Episode file.** Write `episodes/NNN-slug.json` with `"detail": 2` (copy the latest episode
-   as a template) and register its manifest in `remotion/src/Root.tsx`.
+   as a template) and register its manifest in `remotion/src/Root.tsx`. Add a `cover` (L20) and
+   start the caption with the searchable question on its own line (L22).
 5. **Build.** `./build.sh episodes/NNN-slug.json`.
 6. **QA.** Run the QA step on the MP4 (loudness, duration and format, contact sheet), then go
    through docs/style/review-checklist.md item by item. Fix failures and rebuild until it passes.
-7. **Hand over.** Send the MP4 and the contact sheet with SendUserFile, plus the post caption
-   (sources listed, "Not affiliated with or endorsed by ..." where an agency is named).
+7. **Hand over.** Send the MP4, the contact sheet and the cover with SendUserFile, plus the post
+   caption (sources listed, "Not affiliated with or endorsed by ..." where an agency is named).
    Say which checklist items you were unsure about.
 8. **Ledger.** Add the episode's looks to docs/style/visual-ledger.md.
 9. **Commit** the episode and any engine changes to `main` with a plain message.

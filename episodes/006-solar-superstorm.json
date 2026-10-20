@@ -13,7 +13,12 @@
     "NOAA Space Weather Prediction Center, Electric Power Transmission (public domain) - https://www.spaceweather.gov/impacts/electric-power-transmission",
     "U.S. Energy Information Administration, How electricity is generated (public domain) - https://www.eia.gov/energyexplained/electricity/how-electricity-is-generated.php"
   ],
-  "caption": "In 1859 the Sun set telegraph machines on fire ☀️⚡ How a solar storm reaches Earth, what it did to Quebec in 1989, and what one could cost today, in 8-bit.\n\nSources (public domain, NOAA, NASA and EIA):\n- NOAA NESDIS, When Solar Storms Attack\n- NOAA NWS, Space Weather safety\n- NASA, Near Miss: The Solar Superstorm of July 2012\n- NOAA SWPC, Coronal Mass Ejections\n- NOAA SWPC, Electric Power Transmission\n- U.S. EIA, How electricity is generated\n\nNot affiliated with or endorsed by NOAA, NASA or the EIA.\n\n#space #sun #solarstorm #howitworks #8bit",
+  "caption": "Could a solar storm take down the power grid?\nIn 1859 the Sun set telegraph machines on fire ☀️⚡ How a solar storm reaches Earth, what it did to Quebec in 1989, and what one could cost today, in 8-bit.\n\nSources (public domain, NOAA, NASA and EIA):\n- NOAA NESDIS, When Solar Storms Attack\n- NOAA NWS, Space Weather safety\n- NASA, Near Miss: The Solar Superstorm of July 2012\n- NOAA SWPC, Coronal Mass Ejections\n- NOAA SWPC, Electric Power Transmission\n- U.S. EIA, How electricity is generated\n\nNot affiliated with or endorsed by NOAA, NASA or the EIA.\n\n#space #sun #solarstorm #howitworks #8bit",
+  "cover": {
+    "title": "SOLAR STORM",
+    "scene": "sun-office",
+    "t": 8.0
+  },
   "scenes": [
     {
       "visual": "sun-hook",

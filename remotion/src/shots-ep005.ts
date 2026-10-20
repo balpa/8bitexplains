@@ -6,10 +6,10 @@ import { Shot, ShotCtx, lineStart, split } from "./shot-kit";
 // Lake Nyos, Cameroon, 21 August 1986 (NASA Earth Observatory).
 
 const hook: Shot = (buf, c) => {
-  const pull = smoothstep(0, 2.6, c.t);
+  const pull = smoothstep(0, 2.6, c.t), push = smoothstep(3.2, c.dur, c.t);
   drawNyos(buf, {
     t: c.t,
-    cam: { x: lerp(LAKE_C.x, 100, pull), y: lerp(LAKE_C.y - 4, 186, pull), zoom: lerp(2.3, 1.05, pull) },
+    cam: { x: lerp(lerp(LAKE_C.x, 100, pull), 150, push), y: lerp(lerp(LAKE_C.y - 4, 186, pull), 214, push), zoom: lerp(lerp(2.3, 1.05, pull), 1.9, push) },
     bulge: lerp(0.45, 1, smoothstep(0, 1.1, c.t)),
     cloud: smoothstep(0.6, c.dur, c.t) * 0.42,
   });
@@ -23,7 +23,9 @@ const magma: Shot = (buf, c) => {
 
 const soda: Shot = (buf, c) => {
   const popAt = c.dur - 0.9;
-  drawSoda(buf, c.t, smoothstep(0, popAt, c.t), clamp01((c.t - popAt) / 1.0));
+  const push = smoothstep(0.3, popAt, c.t), back = smoothstep(popAt, popAt + 0.5, c.t);
+  const cam = { x: 90, y: lerp(lerp(160, 96, push), 120, back), zoom: lerp(lerp(1, 1.9, push), 1.15, back) };
+  drawSoda(buf, c.t, smoothstep(0, popAt, c.t), clamp01((c.t - popAt) / 1.0), cam);
   if (c.t > popAt) drawBird(buf, 130, 150 + Math.sin(c.t * 9) * 2, c.frame, true, 2, true);
 };
 
