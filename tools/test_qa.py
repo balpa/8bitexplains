@@ -8,6 +8,7 @@ from unittest import mock
 
 import numpy as np
 import pyloudnorm as pyln
+from PIL import Image, ImageDraw
 
 import qa
 
@@ -175,6 +176,24 @@ class QaMainTest(unittest.TestCase):
         warnings = report[report.index("Warnings:") + 1:]
         self.assertIn("- picture holds 5.5s from 0.0s", warnings)
         self.assertIn("- short line, Kokoro may read it weakly: 'Hi.'", warnings)
+
+
+class MotionFramesTest(unittest.TestCase):
+    def test_motion_frames_drops_the_caption_band(self):
+        def ffmpeg(name, *args):
+            for k in range(3):
+                frame = Image.new("L", (1080, 1920), 0)
+                ImageDraw.Draw(frame).rectangle((0, 1180, 1079, 1919), fill=255)
+                frame.save(args[-1] % (k + 1))
+            return ""
+
+        with mock.patch.object(qa, "tool", side_effect=ffmpeg) as tool:
+            frames = qa.motion_frames(Path("ep999.mp4"))
+        self.assertEqual(frames.shape, (3, 49, 45))
+        self.assertEqual(frames.max(), 0)
+        args = tool.call_args.args
+        self.assertEqual(args[0], "ffmpeg")
+        self.assertEqual(args[args.index("-r") + 1], str(qa.HOLD_FPS))
 
 
 if __name__ == "__main__":
