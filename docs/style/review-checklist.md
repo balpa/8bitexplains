@@ -12,6 +12,9 @@ review again. Add a line here whenever a logged critique slips through.
 - [ ] First word by 0.35 s, 160-200 wpm, aftermath scene right before the save point (QA script
       checks).
 - [ ] No text outside the safe zone (x 90-990, y 220-1440).
+- [ ] No picture holds over 4 s before the save point; read the warnings for 3-4 s stretches
+      (L18).
+- [ ] No short-line warnings, or each one listened to and kept on purpose (L21).
 
 ## By eye (from the contact sheet)
 
@@ -42,4 +45,8 @@ review again. Add a line here whenever a logged critique slips through.
       the metaphor is mapped explicitly.
 - [ ] The outro has the takeaway and "Follow Eight Bit Explains." as two lines, with a 1 s pause
       between them (L17, QA checks this).
+- [ ] At most one text block besides the captions in every contact-sheet frame (L19).
+- [ ] `out/<id>-cover.png` exists; in `out/grid-preview.png` the title reads at grid size and the
+      series looks consistent (L20).
+- [ ] The caption's first line is the searchable question (L22).
 - [ ] Every rule in docs/style/learnings.md is satisfied; name any you are unsure about.

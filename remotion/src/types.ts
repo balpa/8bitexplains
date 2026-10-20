@@ -15,4 +15,6 @@ export type Scene = {
   lines: Line[];
 };
 
-export type Manifest = { id: string; title: string; fps: number; detail?: number; scenes: Scene[] };
+export type Cover = { title: string; scene: string; t: number };
+
+export type Manifest = { id: string; title: string; fps: number; detail?: number; cover?: Cover; scenes: Scene[] };

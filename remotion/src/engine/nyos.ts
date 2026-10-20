@@ -251,37 +251,42 @@ const halfWidth = (y: number) => {
   return 22;
 };
 
-export const drawSoda = (buf: Buf, t: number, pressure: number, pop: number) => {
+export const drawSoda = (buf: Buf, t: number, pressure: number, pop: number, cam: Camera = { x: W / 2, y: H / 2, zoom: 1 }) => {
   const cx = 90;
-  shadeAll(buf, (x, y) => {
-    let c = pick(WALLPAPER, x, y, 0.4 + 0.25 * Math.sin(x / 3) * (Math.floor(x / 12) % 2 ? 1 : 0) + 0.2 * (1 - Math.abs(x - 90) / 120));
-    if (y > 252) c = pick(TABLE, x, y, 0.8 - (y - 252) / 90 + 0.12 * Math.sin(x / 6 + y / 30));
+  shadeAll(buf, (sx, sy) => {
+    const { x, y } = toWorld(cam, sx, sy);
+    let c = pick(WALLPAPER, sx, sy, 0.4 + 0.25 * Math.sin(x / 3) * (Math.floor(x / 12) % 2 ? 1 : 0) + 0.2 * (1 - Math.abs(x - 90) / 120));
+    if (y > 252) c = pick(TABLE, sx, sy, 0.8 - (y - 252) / 90 + 0.12 * Math.sin(x / 6 + y / 30));
     if (y > 252 && y < 256) c = TABLE[3];
     const sh = Math.hypot((x - cx - 6) / 34, (y - 256) / 5);
-    if (y > 252 && sh < 1 && cover(x, y, 0.8)) c = hex("#12080a");
+    if (y > 252 && sh < 1 && cover(sx, sy, 0.8)) c = hex("#12080a");
     const hw = halfWidth(y);
     if (hw > 0 && Math.abs(x - cx) < hw) {
       const u = (x - cx) / hw;
       const light = 0.55 - u * 0.35 + (u < -0.55 && u > -0.75 ? 0.5 : 0);
       const liquidTop = lerp(100, 116, pop);
       if (y > liquidTop) {
-        c = pick(SODA, x, y, light * 0.9);
+        c = pick(SODA, sx, sy, light * 0.9);
         const pack = pressure * smoothstep(liquidTop, 250, y);
         if (noise3(x * 1.1, y * 1.1 + t * (pop > 0 ? 18 : 2), t) > 1 - pack * 0.4) c = FOAM[1];
-      } else c = pick(GLASS, x, y, light * 0.6);
-      if (Math.abs(u) > 0.88) c = pick(GLASS, x, y, light);
+      } else c = pick(GLASS, sx, sy, light * 0.6);
+      if (Math.abs(u) > 0.88) c = pick(GLASS, sx, sy, light);
     }
     return c;
   });
   const capY = lerp(66, -40, smoothstep(0, 0.35, pop)), capRot = pop * 9;
-  shadeAll(buf, (x, y) => (Math.abs(x - cx - Math.sin(capRot) * 2) < 8 && y > capY && y < capY + 6 ? pick(ramp(["#8a1020", "#d0303a", "#ff6a6a"]), x, y, 0.8 - (x - cx + 8) / 20) : null), 70, capY - 1, 110, capY + 8);
+  shadeAll(buf, (sx, sy) => {
+    const { x, y } = toWorld(cam, sx, sy);
+    return Math.abs(x - cx - Math.sin(capRot) * 2) < 8 && y > capY && y < capY + 6 ? pick(ramp(["#8a1020", "#d0303a", "#ff6a6a"]), sx, sy, 0.8 - (x - cx + 8) / 20) : null;
+  });
   if (pop > 0) {
     const h = 150 * smoothstep(0, 0.5, pop);
-    shadeAll(buf, (x, y) => {
+    shadeAll(buf, (sx, sy) => {
+      const { x, y } = toWorld(cam, sx, sy);
       const top = 72 - h;
       if (y < top || y > 76) return null;
       const w = 6 + (72 - y) * 0.18 + 3 * noise3(x * 0.3, y * 0.2 - t * 8, t);
-      return Math.abs(x - cx) < w ? pick(FOAM, x, y, 0.4 + noise3(x * 0.5, y * 0.4 - t * 10, 2) * 0.7) : null;
-    }, 30, 0, 150, 78);
+      return Math.abs(x - cx) < w ? pick(FOAM, sx, sy, 0.4 + noise3(x * 0.5, y * 0.4 - t * 10, 2) * 0.7) : null;
+    });
   }
 };

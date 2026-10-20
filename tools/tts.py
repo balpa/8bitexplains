@@ -56,6 +56,7 @@ def main(episode_path: str) -> None:
             dur = len(samples) / sr
             lines.append({
                 "text": text,
+                "tokens": len(kokoro.tokenizer.phonemize(text, "en-us")),
                 "startFrame": round(cursor * FPS),
                 "endFrame": round((cursor + dur) * FPS),
             })
@@ -74,6 +75,8 @@ def main(episode_path: str) -> None:
         print(f"scene {i}: {len(audio) / sr:.2f}s")
 
     manifest = {"id": ep_id, "title": episode["title"], "fps": FPS, "detail": episode.get("detail", 1), "scenes": scenes}
+    if "cover" in episode:
+        manifest["cover"] = episode["cover"]
     out = ROOT / "remotion" / "src" / "generated" / f"{ep_id}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(manifest, indent=2) + "\n")

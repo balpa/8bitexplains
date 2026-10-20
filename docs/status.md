@@ -14,13 +14,14 @@ Read this first when resuming on another machine. Updated 2026-10-20.
 
 ## Next steps (in order)
 
-1. **QA guards and cover** (Priority 2 of the plan):
-   - hold-time check in `tools/qa.py` (warn above 3 s still, fail above 4 s, outro exempt);
-   - text layout rule in `Episode.tsx` (captions plus at most one other text block, fonts in
-     multiples of 24 px);
-   - short-line warning (Kokoro reads lines under about 20 tokens weakly);
-   - cover generator: `out/<id>-cover.png`, title 96-120 px inside x 65-1015, y 400-1248;
-   - fix what the new guards flag in ep005-ep007, re-render them, send MP4, contact sheet, cover.
+1. **QA guards and cover** (Priority 2 of the plan). Code done on 2026-10-20:
+   - hold-time check in `tools/qa.py` (L18), short-line warning (L21);
+   - text layout rule and 24 px font grid in `Episode.tsx` (L19), captions chunked to two lines;
+   - cover generator `remotion/src/Cover.tsx` plus `tools/covers.py` grid preview (L20);
+   - camera moves fixing the flagged stills in ep005 (hook, soda), ep006 (shield), ep007 (hook,
+     heat); caption question first (L22).
+   - Still open: re-render ep005-ep007 with all of this, check QA and contact sheets, send the
+     owner MP4, contact sheet and cover.
 2. **Owner posts** ep005-ep007 with the checklist; `docs/data/posts.csv` starts.
 3. **Audio arc** (Priority 3), then **visual craft** (Priority 4), one at a time, checked against
    the data.

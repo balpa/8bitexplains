@@ -13,7 +13,12 @@
     "NOAA National Severe Storms Laboratory, Severe Weather 101: Lightning (public domain) - https://www.nssl.noaa.gov/education/svrwx101/lightning/",
     "NOAA National Severe Storms Laboratory, Lightning FAQ (public domain) - https://www.nssl.noaa.gov/education/svrwx101/lightning/faq/"
   ],
-  "caption": "Lightning is 5 times hotter than the surface of the Sun ⚡ Where the charge comes from, why thunder booms, and what lightning costs us, in 8-bit.\n\nSources (public domain, NOAA):\n- Lightning: Did you know?\n- Understanding Lightning: Thunder\n- Understanding Lightning: Overview\n- How Dangerous is Lightning?\n- NOAA NSSL, Severe Weather 101: Lightning and Lightning FAQ\n\nNot affiliated with or endorsed by NOAA or the National Weather Service.\n\n#lightning #weather #science #howitworks #8bit",
+  "caption": "How is lightning hotter than the Sun?\nLightning is 5 times hotter than the surface of the Sun ⚡ Where the charge comes from, why thunder booms, and what lightning costs us, in 8-bit.\n\nSources (public domain, NOAA):\n- Lightning: Did you know?\n- Understanding Lightning: Thunder\n- Understanding Lightning: Overview\n- How Dangerous is Lightning?\n- NOAA NSSL, Severe Weather 101: Lightning and Lightning FAQ\n\nNot affiliated with or endorsed by NOAA or the National Weather Service.\n\n#lightning #weather #science #howitworks #8bit",
+  "cover": {
+    "title": "HOTTER THAN THE SUN",
+    "scene": "bolt-strike",
+    "t": 5.6
+  },
   "scenes": [
     {
       "visual": "bolt-hook",
@@ -66,7 +71,7 @@
       "sub": "THE BOOM",
       "vo": [
         "Air heated that fast explodes outward, like a popping balloon.",
-        "That bang is thunder."
+        "That bang is what we call thunder."
       ]
     },
     {

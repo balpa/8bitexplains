@@ -10,7 +10,12 @@
     "USGS Open-File Report 97-487, Evans and others (1997), lake overturn and gas release (public domain) - https://pubs.usgs.gov/of/1997/of97-487/data/OFR97-487.pdf",
     "USGS publication 70032981, Lake Nyos degassing (public domain) - https://pubs.usgs.gov/publication/70032981"
   ],
-  "caption": "In 1986 a quiet lake killed almost 1,800 people in one evening. No wave, no fire, just gas 🫧 How Lake Nyos became a shaken soda bottle, in 8-bit.\n\nSources (public domain, NASA and USGS):\n- NASA Earth Observatory, Lake Nyos, Cameroon\n- USGS Open-File Report 97-487\n- USGS, Lake Nyos degassing\n\nNot affiliated with or endorsed by NASA or the USGS.\n\n#science #volcano #geology #howitworks #8bit",
+  "caption": "How did a lake kill 1,800 people overnight?\nIn 1986 a quiet lake killed almost 1,800 people in one evening. No wave, no fire, just gas 🫧 How Lake Nyos became a shaken soda bottle, in 8-bit.\n\nSources (public domain, NASA and USGS):\n- NASA Earth Observatory, Lake Nyos, Cameroon\n- USGS Open-File Report 97-487\n- USGS, Lake Nyos degassing\n\nNot affiliated with or endorsed by NASA or the USGS.\n\n#science #volcano #geology #howitworks #8bit",
+  "cover": {
+    "title": "KILLER LAKE",
+    "scene": "nyos-village",
+    "t": 2.0
+  },
   "scenes": [
     {
       "visual": "nyos-hook",

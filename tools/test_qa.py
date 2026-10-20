@@ -70,6 +70,33 @@ class QaTest(unittest.TestCase):
         }
         self.assertEqual(dict(qa.script_checks(manifest))[f"pause before the follow line >= {qa.CTA_PAUSE_S}s"], False)
 
+    def test_holds_measure_how_long_a_picture_stays_put(self):
+        rng = np.random.default_rng(0)
+        still = rng.uniform(0, 255, (49, 45))
+        frames = np.array([still] * 8 + [rng.uniform(0, 255, (49, 45)) for _ in range(4)])
+        h = qa.holds(frames, fps=2)
+        self.assertEqual(h[0], 3.5)
+        self.assertEqual(h[8], 0.0)
+
+    def test_holds_ignore_a_global_brightness_flash(self):
+        rng = np.random.default_rng(1)
+        still = rng.uniform(50, 150, (49, 45))
+        frames = np.array([still, still * 1.6 + 20, still, still, rng.uniform(0, 255, (49, 45))])
+        self.assertEqual(qa.holds(frames, fps=2)[0], 1.5)
+
+    def test_long_holds_flag_stills_and_exempt_the_save_point(self):
+        h = np.array([0.0, 4.5, 4.0, 3.5, 3.0, 2.5, 2.0, 1.5, 1.0, 0.5, 0.0, 0.0, 6.0, 5.5])
+        self.assertEqual(qa.long_holds(h, until_s=6.0, fps=2), [(0.5, 4.5)])
+        self.assertEqual(qa.long_holds(np.full(10, 0.5), until_s=5.0, fps=2), [])
+
+    def test_long_holds_cut_a_still_at_the_save_point(self):
+        h = np.array([0.0, 0.0, 6.0, 5.5, 5.0])
+        self.assertEqual(qa.long_holds(h, until_s=2.0, fps=2), [])
+
+    def test_short_lines_lists_lines_under_the_token_floor(self):
+        manifest = {"scenes": [{"lines": [{"text": "That bang is thunder.", "tokens": 17}, {"text": "long enough", "tokens": 40}, {"text": "old manifest"}]}]}
+        self.assertEqual(qa.short_lines(manifest), ["That bang is thunder."])
+
     def test_grid_rounds_rows_up(self):
         self.assertEqual(qa.grid(21, 7), (7, 3))
         self.assertEqual(qa.grid(22, 7), (7, 4))

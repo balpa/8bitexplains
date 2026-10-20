@@ -83,50 +83,62 @@ const AFTERNOON = ramp(["#3a6ab8", "#5a8ad0", "#8ab0e0", "#c0d4ee", "#f0dcc8"]);
 const LAWN = ramp(["#1f4a24", "#2f6a2e", "#4a8a3a", "#6aa848"]);
 const CANOPY = [ramp(["#7a1020", "#c02a3a", "#ff5a6a"]), ramp(["#8a6a10", "#e0b020", "#ffe06a"])];
 
-export const drawShield = (buf: Buf, t: number, hit: number, current: number) => {
-  const ucx = 98, ucy = 150, ur = 38, tilt = Math.sin(t * 9) * 0.12 * hit;
-  shadeAll(buf, (x, y) => {
-    if (y < 190) return pick(AFTERNOON, x, y, 0.1 + y / 210);
+export const drawShield = (buf: Buf, t: number, hit: number, current: number, cam: Camera = { x: W / 2, y: H / 2, zoom: 1 }, open = 1) => {
+  const ucx = 98, ucy = 150, ur = 38, urw = ur * lerp(0.18, 1, open), tilt = Math.sin(t * 9) * 0.12 * hit;
+  const z = cam.zoom;
+  const S = (x: number, y: number) => toScreen(cam, x, y);
+  const line = (x0: number, y0: number, x1: number, y1: number, c: RGB, w: number) => {
+    const a = S(x0, y0), b = S(x1, y1);
+    fineLine(buf, a.x, a.y, b.x, b.y, c, w * z);
+  };
+  shadeAll(buf, (sx, sy) => {
+    const { x, y } = toWorld(cam, sx, sy);
+    if (y < 190) return pick(AFTERNOON, sx, sy, 0.1 + y / 210);
     const far = y < 196;
-    return far ? pick(ramp(["#2a5a3a", "#3a6a44"]), x, y, 0.5) : pick(LAWN, x, y, 0.9 - (y - 196) / 140 + 0.1 * Math.sin(x * 0.7 + y * 0.3));
+    return far ? pick(ramp(["#2a5a3a", "#3a6a44"]), sx, sy, 0.5) : pick(LAWN, sx, sy, 0.9 - (y - 196) / 140 + 0.1 * Math.sin(x * 0.7 + y * 0.3));
   });
-  shadeAll(buf, (x, y) => {
+  shadeAll(buf, (sx, sy) => {
+    const { x, y } = toWorld(cam, sx, sy);
     const fence = y > 168 && y < 196 && Math.floor(x) % 9 < 6 && (y > 172 || Math.floor(x) % 9 > 1);
-    return fence ? pick(ramp(["#8a7a6a", "#c8b8a0", "#e8dcc8"]), x, y, 0.4 + (Math.floor(x) % 9) / 12) : null;
-  }, 0, 168, W, 197);
+    return fence ? pick(ramp(["#8a7a6a", "#c8b8a0", "#e8dcc8"]), sx, sy, 0.4 + (Math.floor(x) % 9) / 12) : null;
+  });
   const wire = hex("#1a1420");
-  fineLine(buf, 150, 120, 150, 230, hex("#4a3020"), 3);
-  fineLine(buf, 140, 124, 160, 124, hex("#4a3020"), 2);
-  for (let x = 150; x < W + 2; x += PX) buf.dot(x, 124 + ((x - 150) / 30) ** 2 * 6, wire);
-  for (let x = -2; x < 150; x += PX) buf.dot(x, 124 + ((150 - x) / 150) ** 2 * 26 - 4, wire);
+  line(150, 120, 150, 230, hex("#4a3020"), 3);
+  line(140, 124, 160, 124, hex("#4a3020"), 2);
+  const wireY = (x: number) => (x < 150 ? 124 + ((150 - x) / 150) ** 2 * 26 - 4 : 124 + ((x - 150) / 30) ** 2 * 6);
+  for (let x = -2; x < W + 2; x += PX / z) {
+    const p = S(x, wireY(x));
+    for (let o = 0; o < z; o += PX) buf.dot(p.x, p.y + o, wire);
+  }
   if (current > 0) {
     for (let k = 0; k < 6; k++) {
       const x = ((t * 80 + k * 30) % 180);
       if (cover(x, 0, current)) {
-        const y = x < 150 ? 124 + ((150 - x) / 150) ** 2 * 26 - 4 : 124 + ((x - 150) / 30) ** 2 * 6;
-        glow(buf, x, y, 6, hex("#ffd23f"), current);
-        buf.dot(x, y, hex("#ffffff"));
+        const p = S(x, wireY(x));
+        glow(buf, p.x, p.y, 6 * z, hex("#ffd23f"), current);
+        buf.dot(p.x, p.y, hex("#ffffff"));
       }
     }
   }
-  shadeAll(buf, (x, y) => {
+  shadeAll(buf, (sx, sy) => {
+    const { x, y } = toWorld(cam, sx, sy);
     const dx = x - ucx, dy = y - ucy;
     const rx = dx * Math.cos(tilt) + dy * Math.sin(tilt), ry = -dx * Math.sin(tilt) + dy * Math.cos(tilt);
     if (ry > 0 || ry < -ur * 0.62) return null;
-    const e = (rx / ur) ** 2 + (ry / (ur * 0.62)) ** 2;
+    const e = (rx / urw) ** 2 + (ry / (ur * 0.62)) ** 2;
     if (e > 1) return null;
-    const scallop = ry > -2 && Math.abs(Math.sin((rx / ur) * Math.PI * 3)) > 0.85 && ry > -1;
+    const scallop = ry > -2 && Math.abs(Math.sin((rx / urw) * Math.PI * 3)) > 0.85 && ry > -1;
     if (scallop) return null;
     const seg = Math.floor(((Math.atan2(ry, rx) + Math.PI) / Math.PI) * 6) % 2;
-    return pick(CANOPY[seg], x, y, 0.85 - (rx + ur) / (2 * ur) * 0.6 - e * 0.2);
-  }, ucx - ur - 4, ucy - ur, ucx + ur + 4, ucy + 4);
-  fineLine(buf, ucx + Math.sin(tilt) * 4, ucy - ur * 0.62, ucx - Math.sin(tilt) * 40, ucy + 46, hex("#3a2a20"), 1.5);
-  fineLine(buf, -2, 214, 26, 200, hex("#1f7a3a"), 3.5);
-  fineLine(buf, 26, 200, 34, 196, hex("#c0c0c8"), 3);
+    return pick(CANOPY[seg], sx, sy, 0.85 - (rx + urw) / (2 * urw) * 0.6 - e * 0.2);
+  });
+  line(ucx + Math.sin(tilt) * 4, ucy - ur * 0.62, ucx - Math.sin(tilt) * 40, ucy + 46, hex("#3a2a20"), 1.5);
+  line(-2, 214, 26, 200, hex("#1f7a3a"), 3.5);
+  line(26, 200, 34, 196, hex("#c0c0c8"), 3);
   const jet = hex("#9ad4ff");
   for (let u = 0; u <= 1; u += 0.01) {
     const x = lerp(34, ucx - ur + 4, u), y = 196 - u * 46 + u * u * 22 + Math.sin(u * 30 - t * 20) * 0.6;
-    fineLine(buf, x, y, x + 1.2, y, u > 0.9 ? hex("#e6f6ff") : jet, 1.2 + hit * 1.2);
+    line(x, y, x + 1.2, y, u > 0.9 ? hex("#e6f6ff") : jet, 1.2 + hit * 1.2);
   }
   const r = rng(5);
   const drop = [hex("#9ad4ff"), hex("#e6f6ff")];
@@ -134,13 +146,14 @@ export const drawShield = (buf: Buf, t: number, hit: number, current: number) =>
   for (let i = 0; i < n; i++) {
     const life = (t * (1.4 + hit) + r()) % 1, spread = (r() - 0.5) * (14 + 30 * hit);
     let x = 36 + life * 120, y = 196 - life * 46 + life * life * 26 + spread * life;
-    const through = r() < hit * 0.35;
-    if (!through && x > ucx - ur - 2 && Math.hypot((x - ucx) / ur, (y - ucy) / (ur * 0.7)) < 1.05) {
-      const back = (x - (ucx - ur)) * 0.9;
-      x = ucx - ur - back * 0.6;
+    const through = r() < hit * 0.35 || open < 0.5;
+    if (!through && x > ucx - urw - 2 && Math.hypot((x - ucx) / urw, (y - ucy) / (ur * 0.7)) < 1.05) {
+      const back = (x - (ucx - urw)) * 0.9;
+      x = ucx - urw - back * 0.6;
       y = y + back * 0.8;
     }
-    buf.put(x, y, drop[i % 2]);
+    const p = S(x, y);
+    buf.put(p.x, p.y, drop[i % 2]);
   }
 };
 

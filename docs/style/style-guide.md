@@ -29,9 +29,11 @@
 
 ## Captions
 
-- No caption box. Centred, outlined text, 3-7 words on screen at a time, current word
-  highlighted. Positioned around y 1250-1420.
-- Headline per scene: one short line, centred, near the top of the safe zone.
+- No caption box. Centred, outlined text at 48 px, 3-7 words on screen at a time, current word
+  highlighted. Positioned around y 1250-1420 (to be checked on a phone with a real post; Meta's ad
+  spec keeps the bottom 35%, from y 1248, clear).
+- Headline per scene: one short line at 48 px (hook 72 px), centred, near the top of the safe
+  zone. Besides the captions only one text block is visible at a time (learnings L19).
 
 ## Audio
 

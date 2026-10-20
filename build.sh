@@ -33,5 +33,9 @@ SERVER=$!
 trap 'kill "$SERVER" 2>/dev/null; rm -rf "$BUNDLE"' EXIT
 sleep 1
 (cd "$ROOT/remotion" && ./node_modules/.bin/remotion render "http://127.0.0.1:$PORT" "$ID" "$ROOT/out/$ID.mp4" --codec=h264 --crf=18)
+if python3 -c 'import json,sys; sys.exit("cover" not in json.load(open(sys.argv[1])))' "$EPISODE"; then
+  (cd "$ROOT/remotion" && ./node_modules/.bin/remotion still "http://127.0.0.1:$PORT" "$ID-cover" "$ROOT/out/$ID-cover.png")
+  "$ROOT/tools/.venv/bin/python" -I "$ROOT/tools/covers.py" "$ROOT/out" "$ID"
+fi
 "$ROOT/tools/.venv/bin/python" -I "$ROOT/tools/qa.py" "$ROOT/out/$ID.mp4" "$ROOT/remotion/src/generated/$ID.json"
-echo "done: out/$ID.mp4 (QA: out/$ID-qa.md, out/$ID-contact.png)"
+echo "done: out/$ID.mp4 (QA: out/$ID-qa.md, out/$ID-contact.png, cover: out/$ID-cover.png, out/grid-preview.png)"

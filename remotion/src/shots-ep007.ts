@@ -10,8 +10,8 @@ const TOP = { x: TREE.x, y: TREE.base - TREE.h + 4 };
 const flashAt = (t: number, at: number) => (t < at ? 0 : Math.exp(-(t - at) * 4.5) * (Math.floor(t * 24) % 5 === 0 ? 0.6 : 1));
 
 const hook: Shot = (buf, c) => {
-  const pull = smoothstep(0.6, 2.8, c.t);
-  const cam = { x: lerp(TREE.x - 6, 92, pull), y: lerp(186, 176, pull), zoom: lerp(1.6, 1.05, pull) };
+  const pull = smoothstep(0.6, 2.8, c.t), push = smoothstep(3.2, c.dur, c.t);
+  const cam = { x: lerp(lerp(TREE.x - 6, 92, pull), TREE.x, push), y: lerp(lerp(186, 176, pull), 180, push), zoom: lerp(lerp(1.6, 1.05, pull), 1.5, push) };
   drawPrairie(buf, { t: c.t, cam, flash: Math.max(0.15 * smoothstep(0, STRIKE, c.t), flashAt(c.t, STRIKE)), rain: 0.5, treeFire: smoothstep(0.4, 1.4, c.t) * 0.7 });
   if (c.t < 1.1 && !(c.t > 0.5 && Math.floor(c.t * 20) % 3 === 0)) drawStrike(buf, strikeBolt(4), smoothstep(0, STRIKE, c.t), cam);
   if (c.t > STRIKE) {
@@ -53,7 +53,7 @@ const strike: Shot = (buf, c) => {
 
 const heat: Shot = (buf, c) => {
   const l1 = lineStart(c, 1, 3), l2 = lineStart(c, 2, 9);
-  drawChannel(buf, c.t, lerp(0.35, 1, smoothstep(l1, l1 + 2, c.t)), smoothstep(l2 - 0.3, l2 + 0.4, c.t));
+  drawChannel(buf, c.t, lerp(0.35, 1, smoothstep(l1, l2 - 0.3, c.t)), smoothstep(l2 - 0.3, l2 + 0.4, c.t));
 };
 
 const fire: Shot = (buf, c) => drawPrairie(buf, { t: c.t, forest: smoothstep(0, 2.2, c.t), flash: flashAt(c.t, 0.1) * 0.6 });

@@ -32,8 +32,10 @@ const surface: Shot = (buf, c) => {
 
 const shield: Shot = (buf, c) => {
   const l1 = lineStart(c, 1, 2.4);
-  drawShield(buf, c.t, smoothstep(l1, l1 + 1, c.t), smoothstep(l1 + 1.4, c.dur, c.t));
-  drawBird(buf, 136, 184 + Math.sin(c.t * 3) * 2, c.frame, true, 2, c.t > l1);
+  const out = smoothstep(l1 - 0.4, l1 + 0.8, c.t);
+  const cam = { x: lerp(98, 90, out), y: lerp(138, 160, out), zoom: lerp(1.9, 1, out) };
+  drawShield(buf, c.t, smoothstep(l1, l1 + 1, c.t), smoothstep(l1 + 1.4, c.dur, c.t), cam, smoothstep(0.2, 1.4, c.t));
+  if (out >= 1) drawBird(buf, 136, 184 + Math.sin(c.t * 3) * 2, c.frame, true, 2, true);
 };
 
 const office: Shot = (buf, c) => {

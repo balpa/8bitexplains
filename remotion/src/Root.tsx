@@ -1,5 +1,6 @@
 import React from "react";
-import { Composition } from "remotion";
+import { Composition, Still } from "remotion";
+import { Cover } from "./Cover";
 import { Episode } from "./Episode";
 import ep001 from "./generated/ep001.json";
 import ep002 from "./generated/ep002.json";
@@ -27,5 +28,10 @@ export const Root: React.FC = () => (
         defaultProps={{ manifest }}
       />
     ))}
+    {episodes
+      .filter((manifest) => manifest.cover)
+      .map((manifest) => (
+        <Still key={`${manifest.id}-cover`} id={`${manifest.id}-cover`} component={Cover} width={WIDTH} height={HEIGHT} defaultProps={{ manifest }} />
+      ))}
   </>
 );
