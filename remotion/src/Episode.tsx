@@ -7,17 +7,19 @@ import type { Manifest, Scene } from "./types";
 
 const TRANSITION = 12;
 const HUD_S = 1.5;
+const LEAD_IN_S = 0.5;
 
 // Press Start 2P is drawn on an 8 px grid, so multiples of 24 put its pixels on the 3 px art grid.
-const fit = (text: string, width: number, sizes = [120, 96, 72, 48]) => sizes.find((s) => text.length * s <= width) ?? 24;
+export const fit = (text: string, width: number, sizes = [120, 96, 72, 48]) => sizes.find((s) => text.length * s <= width) ?? 24;
+export const longestWord = (text: string) => text.split(" ").reduce((a, w) => (w.length > a.length ? w : a), "");
 
 // Besides the captions only one text block is on screen: the headline until a stat, reveal or the
-// save screen takes over.
-const overlayFrom = (scene: Scene) => {
-  if (scene.visual.endsWith("outro")) return scene.lines[scene.lines.length - 1]?.startFrame ?? 0;
-  if (scene.stat) return scene.statLine === undefined ? 0 : scene.lines[scene.statLine]?.startFrame ?? 0;
-  if (scene.reveal) return scene.lines[scene.reveal.line]?.startFrame ?? 0;
-  return Infinity;
+// save screen takes over. One that starts during the lead-in owns the scene from frame 0, so the
+// headline never flashes for a few frames.
+const overlayFrom = (scene: Scene, fps: number) => {
+  const at = (line: number | undefined) => (line === undefined ? 0 : scene.lines[line]?.startFrame ?? 0);
+  const from = scene.visual.endsWith("outro") ? at(scene.lines.length - 1) : scene.stat ? at(scene.statLine) : scene.reveal ? at(scene.reveal.line) : Infinity;
+  return from < LEAD_IN_S * fps ? 0 : from;
 };
 
 export const sceneStarts = (m: Manifest) =>
@@ -97,20 +99,26 @@ const Hud: React.FC<{ level: number; levels: number }> = ({ level, levels }) => 
 
 const Headline: React.FC<{ scene: Scene; fps: number; level: number; levels: number }> = ({ scene, fps, level, levels }) => {
   const frame = useCurrentFrame();
-  if (frame >= overlayFrom(scene)) return null;
+  const header = frame < HUD_S * fps;
+  const showMain = frame < overlayFrom(scene, fps);
+  if (!header && !showMain) return null;
   const pop = interpolate(frame, [0, 4, 7], [0.6, 1.08, 1], { extrapolateRight: "clamp" });
   const isLevel = scene.title.startsWith("LEVEL");
   const main = isLevel ? scene.sub : scene.title;
   const sub = isLevel || scene.visual.endsWith("outro") ? "" : scene.sub;
   return (
     <>
-      {frame < HUD_S * fps && <Hud level={level} levels={levels} />}
+      {header && <Hud level={level} levels={levels} />}
       <div style={{ ...column, top: 330, transform: `scale(${pop})` }}>
-        {isLevel && frame < HUD_S * fps && <div style={{ fontSize: 24, color: C.cyan, textShadow: OUTLINE(3), marginBottom: 18 }}>{scene.title}</div>}
-        <div style={{ fontSize: scene.visual.endsWith("hook") ? 72 : 48, lineHeight: 1.3, color: scene.visual.endsWith("hook") ? C.red : C.yellow, textShadow: OUTLINE(5) }}>
-          {main}
-        </div>
-        {sub && <div style={{ fontSize: 24, marginTop: 24, textShadow: OUTLINE(3) }}>{sub}</div>}
+        {isLevel && <div style={{ fontSize: 24, color: C.cyan, textShadow: OUTLINE(3), marginBottom: 18, visibility: header ? "visible" : "hidden" }}>{scene.title}</div>}
+        {showMain && (
+          <>
+            <div style={{ fontSize: scene.visual.endsWith("hook") ? 72 : 48, lineHeight: 1.3, color: scene.visual.endsWith("hook") ? C.red : C.yellow, textShadow: OUTLINE(5) }}>
+              {main}
+            </div>
+            {sub && <div style={{ fontSize: 24, marginTop: 24, textShadow: OUTLINE(3) }}>{sub}</div>}
+          </>
+        )}
       </div>
     </>
   );
@@ -172,7 +180,7 @@ const Overlay: React.FC<{ scene: Scene; fps: number }> = ({ scene, fps }) => {
     default:
       break;
   }
-  const from = overlayFrom(scene);
+  const from = overlayFrom(scene, fps);
   if (frame < from) return null;
   if (scene.visual.endsWith("outro"))
     return (
@@ -200,7 +208,7 @@ const Overlay: React.FC<{ scene: Scene; fps: number }> = ({ scene, fps }) => {
   if (scene.reveal)
     return (
       <div style={{ ...column, top: 660, textShadow: OUTLINE(6) }}>
-        <div style={{ fontSize: 72, lineHeight: 1.3, color: C.yellow }}>{scene.reveal.main}</div>
+        <div style={{ fontSize: fit(longestWord(scene.reveal.main), SAFE.right - SAFE.left, [72, 48]), lineHeight: 1.3, color: C.yellow }}>{scene.reveal.main}</div>
         <div style={{ fontSize: 24, marginTop: 24, lineHeight: 1.5, textShadow: OUTLINE(3) }}>{scene.reveal.sub}</div>
       </div>
     );

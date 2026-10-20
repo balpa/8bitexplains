@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useRef } from "react";
 import { AbsoluteFill } from "remotion";
 import { H, K, W, setDetail } from "./engine/pixel";
 import { drawBird } from "./engine/sprites";
-import { column, renderFrame, sceneStarts } from "./Episode";
+import { column, fit, longestWord, renderFrame, sceneStarts } from "./Episode";
 import { C, OUTLINE } from "./theme";
 import type { Manifest } from "./types";
 
@@ -11,7 +11,9 @@ import type { Manifest } from "./types";
 export const coverFrame = (m: Manifest) => {
   const cover = m.cover!;
   const i = m.scenes.findIndex((s) => s.visual === cover.scene);
-  return sceneStarts(m)[Math.max(0, i)] + Math.round(cover.t * m.fps);
+  const local = Math.round(cover.t * m.fps);
+  if (i < 0 || local < 0 || local >= m.scenes[i].durationInFrames) throw new Error(`${m.id}: cover ${cover.scene} @ ${cover.t}s is not inside a scene`);
+  return sceneStarts(m)[i] + local;
 };
 
 const Art: React.FC<{ manifest: Manifest }> = ({ manifest }) => {
@@ -33,7 +35,7 @@ export const Cover: React.FC<{ manifest: Manifest }> = ({ manifest }) => (
     <div style={{ ...column, left: 65, width: 950, top: 312, fontSize: 48, textShadow: OUTLINE(4) }}>
       8-BIT <span style={{ color: C.yellow }}>EXPLAINS</span>
     </div>
-    <div style={{ ...column, left: 65, width: 950, top: 552, fontSize: 120, lineHeight: 1.25, color: C.yellow, textShadow: OUTLINE(6) }}>
+    <div style={{ ...column, left: 65, width: 950, top: 552, fontSize: fit(longestWord(manifest.cover!.title), 950, [120, 96, 72]), lineHeight: 1.25, color: C.yellow, textShadow: OUTLINE(6) }}>
       {manifest.cover!.title}
     </div>
     <div style={{ ...column, left: 65, width: 950, top: 1176, fontSize: 48, color: C.cyan, textShadow: OUTLINE(4) }}>

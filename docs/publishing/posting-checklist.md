@@ -19,7 +19,7 @@ What the owner does for every post. Background and sources: docs/research/growth
      reach; unlabelled realistic AI content can be removed or restricted.
    - Instagram's "AI-generated profile" label is only for accounts that feature an AI-generated
      person. It does not apply to us.
-3. **Cover:** the episode's cover frame (`out/<id>-cover.png`, once the cover generator exists).
+3. **Cover:** the episode's cover frame, `out/<id>-cover.png` (written by `build.sh`).
 4. **Caption:** first line is the searchable question and matches the on-screen headline. Then
    the sources and "Not affiliated with or endorsed by ..." from the episode JSON.
 5. **Hashtags:** 3-5 specific ones. Instagram allows at most 5.

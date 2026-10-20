@@ -21,6 +21,21 @@ class GapsTest(unittest.TestCase):
         self.assertEqual(tts.gaps_after(scene), [tts.GAP_S, tts.GAP_S])
 
 
+class CoverTest(unittest.TestCase):
+    SCENES = [{"visual": "a-hook", "durationInFrames": 90}, {"visual": "a-peak", "durationInFrames": 60}]
+
+    def test_a_frame_inside_the_scene_passes(self):
+        tts.check_cover({"title": "X", "scene": "a-peak", "t": 1.9}, self.SCENES)
+
+    def test_an_unknown_scene_is_rejected(self):
+        with self.assertRaises(ValueError):
+            tts.check_cover({"title": "X", "scene": "a-peek", "t": 1.0}, self.SCENES)
+
+    def test_a_time_past_the_scene_end_is_rejected(self):
+        with self.assertRaises(ValueError):
+            tts.check_cover({"title": "X", "scene": "a-peak", "t": 2.0}, self.SCENES)
+
+
 class MainTest(unittest.TestCase):
     PHONEMES = {"Hello there.": "həlˈoʊ ðˈɛɹ.", "Hi.": "hˈaɪ.", "Follow Eight Bit Explains.": "fˈɑːloʊ ˈeɪt bˈɪt ɛksplˈeɪnz."}
 

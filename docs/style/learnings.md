@@ -13,8 +13,10 @@ Research-backed guards the owner approved with the plan (docs/research/improveme
   3 s and fails above 4 s. Fix a flagged stretch with a camera move or a story event tied to the
   line being spoken, never with noise.
 - **L19 One text block besides the captions.** The headline shows until a stat, reveal or the
-  save screen takes over (`overlayFrom` in Episode.tsx); the HUD and the "LEVEL n" tag show only
-  for the first 1.5 s of a scene. Font sizes are multiples of 24 so Press Start 2P lands on the
+  save screen takes over (`overlayFrom` in Episode.tsx); one that starts in the first 0.5 s owns
+  the scene from frame 0. The HUD and the "LEVEL n" tag form the scene header: they show for the
+  first 1.5 s of every scene, stat scenes included, and the tag keeps its space when it hides so
+  the headline never jumps. Font sizes are multiples of 24 so Press Start 2P lands on the
   3 px art grid (`test_layout.py`).
 - **L20 Every episode ships a cover.** `cover: {title, scene, t}` in the episode JSON renders
   `out/<id>-cover.png` from one template: the peak image, a 2-4 word title at 120 px (7 characters

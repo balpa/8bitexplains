@@ -108,7 +108,7 @@ export const drawShield = (buf: Buf, t: number, hit: number, current: number, ca
   const wireY = (x: number) => (x < 150 ? 124 + ((150 - x) / 150) ** 2 * 26 - 4 : 124 + ((x - 150) / 30) ** 2 * 6);
   for (let x = -2; x < W + 2; x += PX / z) {
     const p = S(x, wireY(x));
-    for (let o = 0; o < z; o += PX) buf.dot(p.x, p.y + o, wire);
+    for (let o = 0; o < z * PX; o += PX) buf.dot(p.x, p.y + o, wire);
   }
   if (current > 0) {
     for (let k = 0; k < 6; k++) {
