@@ -24,7 +24,8 @@
 - Text and key subjects stay inside the safe zone and are centred horizontally:
   x 90-990, y 220-1440. Nothing important below y 1440 (captions/buttons of the apps) or in the
   right-hand 120 px rail.
-- Logical pixel canvas 180x320 scaled 6x, nearest-neighbour. Text uses Press Start 2P.
+- Logical pixel canvas 180x320; new episodes use `"detail": 2` (360x640 physical, 3 px on
+  screen, see learnings L14), nearest-neighbour. Text uses Press Start 2P.
 
 ## Captions
 
@@ -41,6 +42,8 @@
 
 ## Pacing
 
-- 45-60 s. Hook in the first 2 s, with motion in frame 1.
-- Structure: hook, "how it works" levels, the surprising number, why it matters, fun fact,
-  save-point outro.
+- 45-55 s (60 s hard maximum). Follow the second-by-second blueprint in
+  docs/research/retention-research.md (learnings L15).
+- Structure, each scene tagged with `beat`: hook (0-3 s, number plus question), how it works
+  (one cause per shot), payoff and re-hook (before 20 s), peak (30-42 s, the surprising number at
+  human scale), answer, aftermath (consequences, L11), takeaway plus save point (1 s or less).

@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef } from "react";
 import { AbsoluteFill, Audio, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
-import { Buf, H, W, dissolve } from "./engine/pixel";
+import { Buf, H, K, W, dissolve, setDetail } from "./engine/pixel";
 import { ShotCtx, drawShot, metaphorEnds, shakeAt } from "./shots";
 import { C, OUTLINE, PIXEL_FONT, SAFE, WIDTH } from "./theme";
 import type { Manifest, Scene } from "./types";
@@ -18,6 +18,7 @@ const ctxFor = (scene: Scene, local: number, fps: number): ShotCtx => ({
 });
 
 const renderFrame = (m: Manifest, frame: number): Buf => {
+  setDetail(m.detail ?? 1);
   const starts = sceneStarts(m);
   const i = Math.max(0, starts.filter((s) => frame >= s).length - 1);
   const scene = m.scenes[i];
@@ -35,8 +36,10 @@ const PixelStage: React.FC<{ manifest: Manifest }> = ({ manifest }) => {
   useLayoutEffect(() => {
     const ctx = ref.current?.getContext("2d");
     if (!ctx) return;
-    ctx.putImageData(new ImageData(renderFrame(manifest, frame).data, W, H), 0, 0);
+    const buf = renderFrame(manifest, frame);
+    ctx.putImageData(new ImageData(buf.data, buf.w, buf.h), 0, 0);
   }, [frame, manifest]);
+  setDetail(manifest.detail ?? 1);
   const starts = sceneStarts(manifest);
   const i = Math.max(0, starts.filter((s) => frame >= s).length - 1);
   const scene = manifest.scenes[i];
@@ -44,8 +47,8 @@ const PixelStage: React.FC<{ manifest: Manifest }> = ({ manifest }) => {
   return (
     <canvas
       ref={ref}
-      width={W}
-      height={H}
+      width={W * K}
+      height={H * K}
       style={{
         position: "absolute",
         left: -24,
@@ -146,10 +149,11 @@ const Overlay: React.FC<{ scene: Scene; fps: number }> = ({ scene, fps }) => {
           <div style={{ fontSize: 40, color: C.yellow, marginTop: 28 }}>@8BITEXPLAINS</div>
         </div>
       );
-  if (scene.stat) {
+  const statFrom = scene.statLine === undefined ? 0 : scene.lines[scene.statLine]?.startFrame ?? 0;
+  if (scene.stat && frame >= statFrom) {
     const [, prefix, num, suffix] = scene.stat.match(/^([^0-9]*)([0-9.,]+)(.*)$/) ?? ["", "", "0", ""];
     const decimals = (num.split(".")[1] ?? "").length;
-    const v = interpolate(frame, [10, 60], [0, parseFloat(num.replace(/,/g, ""))], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+    const v = interpolate(frame - statFrom, [10, 60], [0, parseFloat(num.replace(/,/g, ""))], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
     const shown = num.includes(",") ? Math.round(v).toLocaleString("en-US") : v.toFixed(decimals);
     return (
       <div style={{ ...column, left: SAFE.left + 120, width: SAFE.right - SAFE.left - 120, top: 700, textShadow: OUTLINE(6) }}>

@@ -32,7 +32,8 @@ of step 1 or step 3: tighten the checklist so it is caught next time.
 - Never use Evrim Ağacı (its terms forbid videos and scripts), The Conversation (CC BY-ND) or
   anything NC/ND/SA.
 - No agency logos; add "Not affiliated with or endorsed by ..." when naming an agency.
-- Topics come from `tools/scout.py` (weekly trending story with a reusable primary source).
+- Topics must be catchy (learnings L12): a popular question or a surprising little-known fact.
+  `tools/scout.py` finds weekly trends; `docs/topics/*.md` holds evergreen candidates.
 
 ## Rendering
 

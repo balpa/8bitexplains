@@ -1,4 +1,4 @@
-import { Buf, H, W, clamp01, dither, hex, lerp, noise3, ramp, smoothstep } from "./pixel";
+import { Buf, H, K, PX, W, clamp01, dither, hex, lerp, noise3, ramp, smoothstep } from "./pixel";
 import { P, R } from "./palette";
 import { PlanetOpts, project } from "./worlds";
 
@@ -18,8 +18,8 @@ export type StormOpts = {
 export const drawStorm = (buf: Buf, globe: PlanetOpts, s: StormOpts) => {
   const night = (globe.night ?? 0) > 0.5;
   const shades = night ? [hex("#5d6aa8"), hex("#8f9ad0"), hex("#c9d0f0")] : [hex("#9aa6d8"), hex("#dfe6ff"), hex("#ffffff")];
-  for (let rr = 0.15; rr < s.radiusDeg; rr += 0.08) {
-    const steps = Math.max(32, Math.round(rr * 60));
+  for (let rr = 0.15; rr < s.radiusDeg; rr += 0.08 * PX) {
+    const steps = Math.max(32, Math.round(rr * 60)) * K;
     for (let k = 0; k < steps; k++) {
       const theta = (k / steps) * Math.PI * 2;
       const u = rr / s.radiusDeg;
@@ -32,7 +32,7 @@ export const drawStorm = (buf: Buf, globe: PlanetOpts, s: StormOpts) => {
       const lon = s.lon + (rr * Math.cos(theta)) / Math.cos(lat * DEG);
       const p = project(globe, lat, lon);
       if (!p.visible) continue;
-      buf.put(p.x, p.y, shades[density > 0.85 ? 2 : density > 0.62 ? 1 : 0]);
+      buf.dot(p.x, p.y, shades[density > 0.85 ? 2 : density > 0.62 ? 1 : 0]);
     }
   }
 };
@@ -59,22 +59,22 @@ export const drawChimney = (buf: Buf, t: number, frame: number, pull: number) =>
   buf.gradient(R.duskSky, 0, H);
   const left = 66, right = 114, top = 96, base = 276;
   const ground = ramp(["#1a0c1e", "#2a1430", "#3a1c40"]);
-  for (let y = base; y < H; y++)
-    for (let x = 0; x < W; x++) buf.put(x, y, ground[dither(x, y, 1 - (y - base) / (H - base), ground.length)]);
-  for (let y = top; y < base; y++)
-    for (let x = left; x < right; x++) {
+  for (let y = base; y < H; y += PX)
+    for (let x = 0; x < W; x += PX) buf.dot(x, y, ground[dither(x, y, 1 - (y - base) / (H - base), ground.length)]);
+  for (let y = top; y < base; y += PX)
+    for (let x = left; x < right; x += PX) {
       const row = Math.floor((y - top) / 6);
-      const seam = (y - top) % 6 === 0 || (x - left + (row % 2) * 6) % 12 === 0;
-      buf.put(x, y, seam ? hex("#2a1020") : BRICK[dither(x, y, 0.4 + 0.5 * (1 - (x - left) / (right - left)), BRICK.length)]);
+      const seam = Math.floor(y - top) % 6 === 0 || Math.floor(x - left + (row % 2) * 6) % 12 === 0;
+      buf.dot(x, y, seam ? hex("#2a1020") : BRICK[dither(x, y, 0.4 + 0.5 * (1 - (x - left) / (right - left)), BRICK.length)]);
     }
   buf.rect(left - 6, top - 6, right - left + 12, 8, hex("#3a1428"));
   const mouthL = 74, mouthR = 106, mouthTop = 238;
   buf.rect(mouthL, mouthTop, mouthR - mouthL, base - mouthTop, hex("#0a0410"));
   const fire = ramp(["#9a2238", "#ff5a3d", "#ffb347", "#ffe8a0"]);
-  for (let y = mouthTop + 8; y < base; y++)
-    for (let x = mouthL + 3; x < mouthR - 3; x++) {
+  for (let y = mouthTop + 8; y < base; y += PX)
+    for (let x = mouthL + 3; x < mouthR - 3; x += PX) {
       const f = (noise3(x * 0.25, y * 0.25 + t * 4, t) * (y - mouthTop)) / (base - mouthTop);
-      if (f > 0.26) buf.put(x, y, fire[dither(x, y, clamp01((f - 0.26) * 2.2), fire.length)]);
+      if (f > 0.26) buf.dot(x, y, fire[dither(x, y, clamp01((f - 0.26) * 2.2), fire.length)]);
     }
   const smoke = [hex("#9a8fb8"), hex("#d8d0ee")];
   for (let i = 0; i < 9; i++) {
@@ -111,21 +111,21 @@ const CLOUD = ramp(["#5d6aa8", "#9aa6d8", "#d8def5", "#ffffff"]);
 
 // One dithered cumulus puff, lit from the upper left.
 const puff = (buf: Buf, cx: number, cy: number, r: number) => {
-  for (let y = -r; y <= r; y++)
-    for (let x = -r; x <= r; x++) {
+  for (let y = -r; y <= r; y += PX)
+    for (let x = -r; x <= r; x += PX) {
       const d = (x * x + y * y) / (r * r);
       if (d > 1) continue;
       const light = clamp01(0.85 - (x + y) / (2.4 * r) - d * 0.35);
-      buf.put(cx + x, cy + y, CLOUD[dither(Math.floor(cx + x), Math.floor(cy + y), light, CLOUD.length)]);
+      buf.dot(cx + x, cy + y, CLOUD[dither(cx + x, cy + y, light, CLOUD.length)]);
     }
 };
 
 // Cross-section of a hurricane: warm sea, inflow at the surface, rising air, towering cloud wall.
 export const drawUpdraft = (buf: Buf, t: number, build: number) => {
   buf.gradient(ramp(["#0b1033", "#1a2a6e", "#2f4fa8"]), 0, 250);
-  for (let y = 250; y < H; y++)
-    for (let x = 0; x < W; x++)
-      buf.put(x, y, R.hot[dither(x, y, clamp01(0.9 - (y - 250) / 90 + noise3(x * 0.1, y * 0.1, t) * 0.2), R.hot.length)]);
+  for (let y = 250; y < H; y += PX)
+    for (let x = 0; x < W; x += PX)
+      buf.dot(x, y, R.hot[dither(x, y, clamp01(0.9 - (y - 250) / 90 + noise3(x * 0.1, y * 0.1, t) * 0.2), R.hot.length)]);
   const levels = Math.round(lerp(1, 9, build));
   for (let i = 0; i < levels; i++) {
     const y = 232 - i * 18;

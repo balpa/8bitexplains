@@ -14,6 +14,15 @@ FPS = 30
 LEAD_S = 0.3
 GAP_S = 0.2
 TAIL_S = 0.45
+OUTRO_PAUSE_S = 1.0
+
+
+def gaps_after(scene: dict) -> list[float]:
+    """Silence after each line; the outro holds a beat after the takeaway, before the follow line."""
+    gaps = [GAP_S] * len(scene["vo"])
+    if scene.get("beat") == "outro" and len(gaps) >= 2:
+        gaps[-2] = OUTRO_PAUSE_S
+    return gaps
 
 
 def espeak_data_path() -> str:
@@ -42,7 +51,7 @@ def main(episode_path: str) -> None:
         chunks = [np.zeros(int(LEAD_S * sr), dtype=np.float32)]
         cursor = LEAD_S
         lines = []
-        for text in scene["vo"]:
+        for text, gap in zip(scene["vo"], gaps_after(scene)):
             samples, sr = kokoro.create(text, voice=episode["voice"], speed=episode["speed"], lang="en-us")
             dur = len(samples) / sr
             lines.append({
@@ -50,8 +59,8 @@ def main(episode_path: str) -> None:
                 "startFrame": round(cursor * FPS),
                 "endFrame": round((cursor + dur) * FPS),
             })
-            chunks += [samples.astype(np.float32), np.zeros(int(GAP_S * sr), dtype=np.float32)]
-            cursor += dur + GAP_S
+            chunks += [samples.astype(np.float32), np.zeros(int(gap * sr), dtype=np.float32)]
+            cursor += dur + gap
         chunks.append(np.zeros(int(TAIL_S * sr), dtype=np.float32))
         audio = np.concatenate(chunks)
         name = f"scene-{i}.wav"
@@ -64,7 +73,7 @@ def main(episode_path: str) -> None:
         })
         print(f"scene {i}: {len(audio) / sr:.2f}s")
 
-    manifest = {"id": ep_id, "title": episode["title"], "fps": FPS, "scenes": scenes}
+    manifest = {"id": ep_id, "title": episode["title"], "fps": FPS, "detail": episode.get("detail", 1), "scenes": scenes}
     out = ROOT / "remotion" / "src" / "generated" / f"{ep_id}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(manifest, indent=2) + "\n")

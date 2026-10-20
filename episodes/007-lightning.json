@@ -1,0 +1,108 @@
+{
+  "id": "ep007",
+  "title": "Lightning is hotter than the Sun",
+  "voice": "am_michael",
+  "speed": 1.18,
+  "detail": 2,
+  "trend": "Evergreen popular question (L12): why thunder booms; lightning is 5x hotter than the Sun's surface",
+  "sources": [
+    "NOAA National Weather Service Fort Worth, Lightning: Did you know? (public domain) - https://www.weather.gov/fwd/lightdidyouknow",
+    "NOAA National Weather Service, Understanding Lightning: Thunder (public domain) - https://www.weather.gov/safety/lightning-science-thunder",
+    "NOAA National Weather Service, Understanding Lightning: Overview (public domain) - https://www.weather.gov/safety/lightning-science-overview",
+    "NOAA National Weather Service, How Dangerous is Lightning? (public domain) - https://www.weather.gov/safety/lightning-odds",
+    "NOAA National Severe Storms Laboratory, Severe Weather 101: Lightning (public domain) - https://www.nssl.noaa.gov/education/svrwx101/lightning/",
+    "NOAA National Severe Storms Laboratory, Lightning FAQ (public domain) - https://www.nssl.noaa.gov/education/svrwx101/lightning/faq/"
+  ],
+  "caption": "Lightning is 5 times hotter than the surface of the Sun ⚡ Where the charge comes from, why thunder booms, and what lightning costs us, in 8-bit.\n\nSources (public domain, NOAA):\n- Lightning: Did you know?\n- Understanding Lightning: Thunder\n- Understanding Lightning: Overview\n- How Dangerous is Lightning?\n- NOAA NSSL, Severe Weather 101: Lightning and Lightning FAQ\n\nNot affiliated with or endorsed by NOAA or the National Weather Service.\n\n#lightning #weather #science #howitworks #8bit",
+  "scenes": [
+    {
+      "visual": "bolt-hook",
+      "beat": "hook",
+      "title": "HOTTER THAN THE SUN",
+      "sub": "EVERY LIGHTNING BOLT",
+      "vo": [
+        "Lightning is five times hotter than the surface of the Sun.",
+        "So how does it get that hot, and why the boom?"
+      ]
+    },
+    {
+      "visual": "bolt-cloud",
+      "beat": "how",
+      "title": "LEVEL 1",
+      "sub": "THE CHARGE",
+      "vo": [
+        "Inside a storm cloud, rising air smashes ice and small hail together.",
+        "Light ice turns positive and rides up. Heavy hail turns negative and sinks."
+      ]
+    },
+    {
+      "visual": "bolt-strike",
+      "beat": "how",
+      "title": "LEVEL 2",
+      "sub": "THE SPARK",
+      "vo": [
+        "Air is an insulator: it holds the charges apart until the difference gets too big.",
+        "Then it fails all at once, in one giant spark."
+      ]
+    },
+    {
+      "visual": "bolt-heat",
+      "beat": "peak",
+      "title": "LEVEL 3",
+      "sub": "THE HEAT",
+      "stat": "50,000°F",
+      "statLabel": "5X THE SUN'S SURFACE",
+      "vo": [
+        "One flash carries about a hundred million volts.",
+        "Its energy heats the air in its path in a few millionths of a second, to fifty thousand degrees Fahrenheit.",
+        "Five times the Sun's surface."
+      ],
+      "statLine": 1
+    },
+    {
+      "visual": "bolt-balloon",
+      "beat": "answer",
+      "title": "LEVEL 4",
+      "sub": "THE BOOM",
+      "vo": [
+        "Air heated that fast explodes outward, like a popping balloon.",
+        "That bang is thunder."
+      ]
+    },
+    {
+      "visual": "bolt-fire",
+      "beat": "impact",
+      "title": "AFTERMATH",
+      "sub": "WHERE THE HEAT GOES",
+      "stat": "10,000",
+      "statLabel": "FOREST FIRES A YEAR",
+      "vo": [
+        "That heat starts about ten thousand forest fires a year."
+      ]
+    },
+    {
+      "visual": "bolt-people",
+      "beat": "aftermath",
+      "title": "AFTERMATH",
+      "sub": "IN THE US",
+      "reveal": {
+        "main": "27 DEATHS A YEAR",
+        "sub": "US AVERAGE, 2009-2018",
+        "line": 0
+      },
+      "vo": [
+        "And lightning killed about twenty-seven Americans a year from two thousand nine to twenty eighteen."
+      ]
+    },
+    {
+      "visual": "bolt-outro",
+      "beat": "outro",
+      "title": "SAVE POINT",
+      "sub": "SAVE THIS ONE",
+      "vo": [
+        "When thunder roars, go indoors.",
+        "Follow Eight Bit Explains."
+      ]
+    }
+  ]
+}

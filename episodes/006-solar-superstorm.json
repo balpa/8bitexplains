@@ -1,0 +1,101 @@
+{
+  "id": "ep006",
+  "title": "When the Sun set telegraphs on fire",
+  "voice": "am_michael",
+  "speed": 1.2,
+  "detail": 2,
+  "trend": "Evergreen surprising fact (L12): the 1859 Carrington storm and modern grid risk",
+  "sources": [
+    "NOAA NESDIS, When Solar Storms Attack: Space Weather and Our Infrastructure (public domain) - https://www.nesdis.noaa.gov/news/when-solar-storms-attack-space-weather-and-our-infrastructure",
+    "NOAA National Weather Service, Space Weather safety (public domain) - https://www.weather.gov/safety/space",
+    "NASA Science, Near Miss: The Solar Superstorm of July 2012 (public domain) - https://science.nasa.gov/science-research/planetary-science/23jul_superstorm/",
+    "NOAA Space Weather Prediction Center, Coronal Mass Ejections (public domain) - https://www.spaceweather.gov/phenomena/coronal-mass-ejections",
+    "NOAA Space Weather Prediction Center, Electric Power Transmission (public domain) - https://www.spaceweather.gov/impacts/electric-power-transmission",
+    "U.S. Energy Information Administration, How electricity is generated (public domain) - https://www.eia.gov/energyexplained/electricity/how-electricity-is-generated.php"
+  ],
+  "caption": "In 1859 the Sun set telegraph machines on fire ☀️⚡ How a solar storm reaches Earth, what it did to Quebec in 1989, and what one could cost today, in 8-bit.\n\nSources (public domain, NOAA, NASA and EIA):\n- NOAA NESDIS, When Solar Storms Attack\n- NOAA NWS, Space Weather safety\n- NASA, Near Miss: The Solar Superstorm of July 2012\n- NOAA SWPC, Coronal Mass Ejections\n- NOAA SWPC, Electric Power Transmission\n- U.S. EIA, How electricity is generated\n\nNot affiliated with or endorsed by NOAA, NASA or the EIA.\n\n#space #sun #solarstorm #howitworks #8bit",
+  "scenes": [
+    {
+      "visual": "sun-hook",
+      "beat": "hook",
+      "title": "THE SUN STARTED FIRES",
+      "sub": "SEPTEMBER 1859",
+      "vo": [
+        "In eighteen fifty-nine, the Sun set telegraph machines on fire.",
+        "Could it happen to our power grid?"
+      ]
+    },
+    {
+      "visual": "sun-surface",
+      "beat": "how",
+      "title": "LEVEL 1",
+      "sub": "THE BLAST",
+      "vo": [
+        "The Sun can hurl billions of tons of magnetized, charged gas at us, arriving in about three days."
+      ]
+    },
+    {
+      "visual": "sun-shield",
+      "beat": "payoff",
+      "title": "LEVEL 2",
+      "sub": "THE SHIELD",
+      "vo": [
+        "Earth's magnetic field is our umbrella.",
+        "A storm whose field points south shakes it harder."
+      ]
+    },
+    {
+      "visual": "sun-office",
+      "beat": "how",
+      "title": "LEVEL 3",
+      "sub": "THE CURRENT",
+      "vo": [
+        "A shaking magnetic field pushes current through long wires, the same trick a generator uses.",
+        "In eighteen fifty-nine, it shocked operators and set telegraphs on fire."
+      ]
+    },
+    {
+      "visual": "sun-quebec",
+      "beat": "peak",
+      "title": "LEVEL 4",
+      "sub": "QUEBEC, 1989",
+      "stat": "90 SECONDS",
+      "statLabel": "TO BLACK OUT 6 MILLION",
+      "vo": [
+        "In nineteen eighty-nine, a smaller storm overloaded transformers.",
+        "Quebec's grid failed in ninety seconds, leaving six million people in the dark."
+      ]
+    },
+    {
+      "visual": "sun-nearmiss",
+      "beat": "answer",
+      "title": "THE ANSWER",
+      "sub": "IT ALMOST DID",
+      "vo": [
+        "In twenty twelve, a storm that strong missed us by about a week."
+      ]
+    },
+    {
+      "visual": "sun-blackout",
+      "beat": "aftermath",
+      "title": "IF IT HITS",
+      "sub": "THE COST TODAY",
+      "stat": "$2 TRILLION",
+      "statLabel": "20 TIMES HURRICANE KATRINA",
+      "vo": [
+        "A direct hit today could cost two trillion dollars and black out up to forty million Americans for weeks,",
+        "since giant transformers can take years to repair."
+      ]
+    },
+    {
+      "visual": "sun-outro",
+      "beat": "outro",
+      "title": "SAVE POINT",
+      "sub": "SAVE THIS ONE",
+      "vo": [
+        "So satellites now watch the Sun.",
+        "Follow Eight Bit Explains."
+      ]
+    }
+  ]
+}

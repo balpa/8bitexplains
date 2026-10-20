@@ -1,5 +1,5 @@
 import { LAND_B64, LAND_H, LAND_W } from "./landmask";
-import { Buf, H, RGB, W, clamp01, dither, fbm, hex, lerp, noise3, ramp, rng, smoothstep } from "./pixel";
+import { Buf, H, PX, RGB, W, clamp01, dither, fbm, hex, lerp, noise3, ramp, rng, smoothstep } from "./pixel";
 import { R } from "./palette";
 
 const STAR_LAYERS = [0.15, 0.4, 1].map((depth, layer) => {
@@ -9,11 +9,11 @@ const STAR_LAYERS = [0.15, 0.4, 1].map((depth, layer) => {
 
 // Starfield with three parallax layers and a faint dithered nebula; `zoom` pushes stars outwards.
 export const drawSpace = (buf: Buf, t: number, zoom = 0, panY = 0) => {
-  for (let y = 0; y < H; y++)
-    for (let x = 0; x < W; x++) {
+  for (let y = 0; y < H; y += PX)
+    for (let x = 0; x < W; x += PX) {
       const n = fbm(x / 60 + 3, (y + panY * 0.2) / 60, t * 0.02);
       const v = clamp01((y / H) * 0.5 + smoothstep(0.45, 0.8, n) * 0.6);
-      buf.put(x, y, R.space[dither(x, y, v, R.space.length)]);
+      buf.dot(x, y, R.space[dither(x, y, v, R.space.length)]);
     }
   const dim = hex("#6c6aa8"), mid = hex("#b7b5e6"), bright = hex("#ffffff");
   STAR_LAYERS.forEach((layer) =>
@@ -89,13 +89,13 @@ export const drawPlanet = (buf: Buf, o: PlanetOpts) => {
   const halo = (o.night ?? 0) > 0.5 ? AIRGLOW : R.halo;
   const x0 = Math.max(0, Math.floor(cx - r - 8)), x1 = Math.min(W, Math.ceil(cx + r + 8));
   const y0 = Math.max(0, Math.floor(cy - r - 8)), y1 = Math.min(H, Math.ceil(cy + r + 8));
-  for (let y = y0; y < y1; y++)
-    for (let x = x0; x < x1; x++) {
-      const nx = (x - cx + 0.5) / r, ny = (y - cy + 0.5) / r, d = nx * nx + ny * ny;
+  for (let y = y0; y < y1; y += PX)
+    for (let x = x0; x < x1; x += PX) {
+      const nx = (x - cx + PX / 2) / r, ny = (y - cy + PX / 2) / r, d = nx * nx + ny * ny;
       if (d > 1) {
         const e = Math.sqrt(d) - 1;
-        if (e < 1.5 / r) buf.put(x, y, halo[1]);
-        else if (e < 6 / r && dither(x, y, 0.55 - ((e * r - 1.5) / 4.5) * 0.55, 2)) buf.put(x, y, halo[0]);
+        if (e < 1.5 / r) buf.dot(x, y, halo[1]);
+        else if (e < 6 / r && dither(x, y, 0.55 - ((e * r - 1.5) / 4.5) * 0.55, 2)) buf.dot(x, y, halo[0]);
         continue;
       }
       const nz = Math.sqrt(1 - d);
@@ -130,7 +130,7 @@ export const drawPlanet = (buf: Buf, o: PlanetOpts) => {
         const city = land && Math.abs(latD) < 60 && fbm(px * 40, py * 40, pz * 40) > 0.7 && dither(x, y, 0.5, 2) > 0;
         if (city && night > 0.5) col = hex(dither(x, y, 0.6, 2) ? "#ffd23f" : "#ff8a3d");
       }
-      buf.put(x, y, col);
+      buf.dot(x, y, col);
     }
   if (o.jetLat !== undefined) {
     const white = hex("#f4f1e8"), cyan = hex("#3ee0ff");
@@ -164,11 +164,11 @@ export const drawOcean = (buf: Buf, o: OceanOpts) => {
   const sun = R.sun;
   const sunX = lerp(142, W / 2, dusk);
   const sunY = lerp(horizon - 26, horizon - 6, dusk), sunR = lerp(9, 24, dusk);
-  for (let y = Math.max(0, Math.floor(sunY - sunR)); y < Math.min(horizon, sunY + sunR); y++)
-    for (let x = Math.floor(sunX - sunR); x < sunX + sunR; x++) {
+  for (let y = Math.max(0, Math.floor(sunY - sunR)); y < Math.min(horizon, sunY + sunR); y += PX)
+    for (let x = Math.floor(sunX - sunR); x < sunX + sunR; x += PX) {
       const d = Math.hypot(x - sunX, y - sunY);
       const stripe = dusk > 0.5 && y > sunY && Math.floor(y - sunY) % 5 < 2;
-      if (d < sunR && !stripe) buf.put(x, y, sun[dither(x, y, 1 - d / sunR, 2)]);
+      if (d < sunR && !stripe) buf.dot(x, y, sun[dither(x, y, 1 - d / sunR, 2)]);
     }
   const cloud = dusk > 0.5 ? [hex("#7a3a7f"), hex("#e08a8f")] : [hex("#b8c8f0"), hex("#ffffff")];
   [[0.1, 0.55, 46], [0.55, 0.35, 56], [0.85, 0.7, 36]].forEach(([fx, fy, cw], i) => {
@@ -183,10 +183,10 @@ export const drawOcean = (buf: Buf, o: OceanOpts) => {
   const front = lerp(-0.9, 1.6, heat);
   const travel = t * speed;
   const white = hex("#f4f1e8");
-  for (let y = Math.max(0, Math.floor(horizon)); y < H; y++) {
+  for (let y = Math.max(0, Math.floor(horizon)); y < H; y += PX) {
     const z = (55 * alt) / (y - horizon + 1.5);
     const fog = Math.min(1, z / 45);
-    for (let x = 0; x < W; x++) {
+    for (let x = 0; x < W; x += PX) {
       const wx = (x - W / 2) * z * 0.045;
       const wz = z + travel;
       const n = noise3(wx * 0.9, wz * 0.9, t * 0.25) * 0.65 + noise3(wx * 2.4, wz * 2.4, t * 0.45) * 0.35;
@@ -202,7 +202,7 @@ export const drawOcean = (buf: Buf, o: OceanOpts) => {
         const cap = noise3((wx + t * 1.6 * wind) * 3, wz * 6, 1.3);
         if (cap > 0.8 - 0.06 * wind && n > 0.5) c = white;
       }
-      buf.put(x, y, c);
+      buf.dot(x, y, c);
     }
   }
   const glow = hex(dusk > 0.5 ? "#ffc46b" : "#d4ecff");
@@ -223,17 +223,17 @@ export const drawUnderwater = (buf: Buf, o: UnderwaterOpts) => {
   const S = o.surface ?? 96;
   buf.gradient(R.daySky, 0, S);
   const far = [hex("#5d78c8"), hex("#7f9ae0")];
-  for (let x = 0; x < W; x++) {
+  for (let x = 0; x < W; x += PX) {
     const hgt = 9 + 6 * Math.sin(x / 13 + 1) + 4 * Math.sin(x / 5.3);
-    for (let y = Math.floor(S - hgt); y < S; y++) buf.put(x, y, far[dither(x, y, (y - (S - hgt)) / hgt, 2)]);
+    for (let y = Math.floor(S - hgt); y < S; y += PX) buf.dot(x, y, far[dither(x, y, (y - (S - hgt)) / hgt, 2)]);
   }
-  for (let y = S; y < H; y++)
-    for (let x = 0; x < W; x++) {
+  for (let y = S; y < H; y += PX)
+    for (let x = 0; x < W; x += PX) {
       const depth = y - S;
       const warmDepth = lerp(warmWest, warmEast, x / W) + 1.5 * Math.sin(x / 7 + t * 2);
       const ray = Math.max(0, Math.sin((x + y * 0.55 - t * 6) / 9)) ** 6 * Math.max(0, 1 - depth / 170);
-      if (depth < warmDepth) buf.put(x, y, R.warm[dither(x, y, 0.95 - (depth / Math.max(1, warmDepth)) * 0.7, R.warm.length)]);
-      else buf.put(x, y, R.deep[dither(x, y, clamp01((1 - depth / 210) * 0.75 + ray * 0.6), R.deep.length)]);
+      if (depth < warmDepth) buf.dot(x, y, R.warm[dither(x, y, 0.95 - (depth / Math.max(1, warmDepth)) * 0.7, R.warm.length)]);
+      else buf.dot(x, y, R.deep[dither(x, y, clamp01((1 - depth / 210) * 0.75 + ray * 0.6), R.deep.length)]);
     }
   const foam = hex("#ffe2b8");
   for (let x = 0; x < W; x++) buf.put(x, S + Math.round(Math.sin(x / 4 + t * 3) * 1.2) - 1, foam);
@@ -261,11 +261,11 @@ export const drawUnderwater = (buf: Buf, o: UnderwaterOpts) => {
     buf.put(fx - 1, fy, eye);
   }
   const rock = hex("#04030c"), rock2 = hex("#0a0820");
-  for (let x = 0; x < W; x++) {
+  for (let x = 0; x < W; x += PX) {
     const left = Math.max(0, 80 - x * 1.6) + 6 * Math.sin(x / 3);
     const right = Math.max(0, (x - 118) * 1.5) + 5 * Math.sin(x / 2.5);
     const hgt = Math.max(left, right);
-    for (let y = Math.floor(H - hgt); y < H; y++) buf.put(x, y, y < H - hgt + 2 ? rock2 : rock);
+    for (let y = Math.floor(H - hgt); y < H; y += PX) buf.dot(x, y, y < H - hgt + 2 ? rock2 : rock);
   }
   for (let k = 0; k < 4; k++) {
     const kx = [20, 34, 150, 164][k];

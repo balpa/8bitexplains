@@ -1,4 +1,4 @@
-import { Buf, H, W, clamp01, dither, hex, lerp, noise3, ramp, rng } from "./pixel";
+import { Buf, H, PX, W, clamp01, dither, hex, lerp, noise3, ramp, rng } from "./pixel";
 import { P, R } from "./palette";
 
 const WATER_Y = 228;
@@ -28,29 +28,29 @@ export type BayOpts = {
 export const drawBay = (buf: Buf, o: BayOpts) => {
   buf.gradient(ramp(["#152a6e", "#2c55b0", "#6f9ee0", "#b8d4f2"]), 0, WATER_Y);
   const far = [hex("#3a4a8a"), hex("#5d6aa8"), hex("#f4f1e8")];
-  for (let x = 0; x < W; x++) {
+  for (let x = 0; x < W; x += PX) {
     const peak = 132 + 16 * Math.sin(x / 15 + 1.3) + 7 * Math.sin(x / 6);
-    for (let y = Math.floor(peak); y < WATER_Y; y++) buf.put(x, y, y < peak + 4 ? far[2] : far[dither(x, y, 1 - (y - peak) / 90, 2)]);
+    for (let y = Math.floor(peak); y < WATER_Y; y += PX) buf.dot(x, y, y < peak + 4 ? far[2] : far[dither(x, y, 1 - (y - peak) / 90, 2)]);
   }
   const rock = ramp(["#1c1830", "#3a3550", "#5d5878", "#8a85a0"]);
   const cliffEdge = (y: number) => 34 + 10 * Math.sin(y / 9) + (y < 120 ? 0 : (y - 120) * 0.15);
   const missing = o.slide;
-  for (let y = 40; y < H; y++)
-    for (let x = 0; x < cliffEdge(y); x++) {
+  for (let y = 40; y < H; y += PX)
+    for (let x = 0; x < cliffEdge(y); x += PX) {
       const scar = missing > 0 && y > 70 && y < 150 && x > cliffEdge(y) - 16 * missing;
-      buf.put(x, y, scar ? rock[3] : rock[dither(x, y, clamp01(0.3 + noise3(x * 0.2, y * 0.2, 0) * 0.6 - x / 200), rock.length)]);
+      buf.dot(x, y, scar ? rock[3] : rock[dither(x, y, clamp01(0.3 + noise3(x * 0.2, y * 0.2, 0) * 0.6 - x / 200), rock.length)]);
     }
   const soil = hex("#6b4a2e"), bare = hex("#8f6a40"), grass = ramp(["#1b4a2a", "#2f7a3a", "#4fa84a"]);
   const reachedY = lerp(WATER_Y, SLOPE.y1, o.reached);
   const forest = ramp(["#0b2414", "#163f22", "#24622e", "#3a8a44"]);
-  for (let x = SLOPE.x0; x < W; x++) {
+  for (let x = SLOPE.x0; x < W; x += PX) {
     const top = slopeY(x);
-    for (let y = Math.floor(top); y < H; y++) {
+    for (let y = Math.floor(top); y < H; y += PX) {
       const depth = y - top;
-      if (top > reachedY - 2) buf.put(x, y, depth < 2 ? bare : soil);
+      if (top > reachedY - 2) buf.dot(x, y, depth < 2 ? bare : soil);
       else {
         const canopy = noise3(x * 0.35, y * 0.35, 1) * 0.6 + 0.4 - depth / 260;
-        buf.put(x, y, depth < 2 ? grass[2] : forest[dither(x, y, clamp01(canopy), forest.length)]);
+        buf.dot(x, y, depth < 2 ? grass[2] : forest[dither(x, y, clamp01(canopy), forest.length)]);
       }
     }
   }
@@ -62,21 +62,21 @@ export const drawBay = (buf: Buf, o: BayOpts) => {
       for (let i = -half; i <= half; i++) buf.put(tr.x + i, tr.y - tr.h + j, tree[dither(Math.floor(tr.x + i), Math.floor(tr.y + j), 0.4 + i * 0.1, tree.length)]);
     }
   });
-  for (let y = WATER_Y; y < H; y++)
-    for (let x = Math.floor(cliffEdge(y)); x < SLOPE.x0 + (y - WATER_Y) * 0.4; x++)
-      buf.put(x, y, R.cold[dither(x, y, clamp01(0.85 - (y - WATER_Y) / 110), R.cold.length)]);
+  for (let y = WATER_Y; y < H; y += PX)
+    for (let x = Math.floor(cliffEdge(y)); x < SLOPE.x0 + (y - WATER_Y) * 0.4; x += PX)
+      buf.dot(x, y, R.cold[dither(x, y, clamp01(0.85 - (y - WATER_Y) / 110), R.cold.length)]);
   const foam = hex(P.white), water = R.cold;
   if (o.surge > 0.01) {
     // A sheet of water running up the slope: thick near the bay, thinning towards the run-up line.
     const xs = lerp(SLOPE.x0, SLOPE.x1, o.surge);
     const x0 = SLOPE.x0 - 40;
-    for (let x = x0; x < Math.min(W, xs + 2); x++) {
+    for (let x = x0; x < Math.min(W, xs + 2); x += PX) {
       const ground = x < SLOPE.x0 ? WATER_Y : slopeY(x);
       const u = clamp01((x - x0) / Math.max(1, xs - x0));
       const thick = 5 + 34 * Math.sin(Math.min(1, u * 1.6) * Math.PI * 0.5) * (1 - u) + 6 * (1 - u);
       const top = ground - thick + Math.sin(x / 3 + o.t * 12) * 1.5;
-      for (let y = Math.floor(top); y < ground + 2; y++)
-        buf.put(x, y, y < top + 2 ? foam : water[dither(x, y, 0.8 - (y - top) / 60, water.length)]);
+      for (let y = Math.floor(top); y < ground + 2; y += PX)
+        buf.dot(x, y, y < top + 2 ? foam : water[dither(x, y, 0.8 - (y - top) / 60, water.length)]);
     }
   }
   if (o.slide > 0 && o.slide < 1) {

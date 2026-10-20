@@ -2,6 +2,15 @@ export const W = 180;
 export const H = 320;
 export const SCALE = 6;
 
+// Shots are drawn in logical 180x320 units; each logical pixel holds K x K physical pixels.
+// Area fills step by PX and use `dot`, so they gain detail; `put` keeps whole logical pixels.
+export let K = 1;
+export let PX = 1;
+export const setDetail = (k: number) => {
+  K = k;
+  PX = 1 / k;
+};
+
 export type RGB = [number, number, number];
 
 export const hex = (h: string): RGB => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
@@ -14,7 +23,7 @@ const BAYER = [
   [15, 7, 13, 5],
 ];
 
-export const bayer = (x: number, y: number) => (BAYER[y & 3][x & 3] + 0.5) / 16;
+export const bayer = (x: number, y: number) => (BAYER[Math.floor(y * K) & 3][Math.floor(x * K) & 3] + 0.5) / 16;
 
 // Picks one of `levels` steps for value v in [0, 1], ordered-dithered by pixel position.
 export const dither = (x: number, y: number, v: number, levels: number) =>
@@ -28,17 +37,28 @@ export const smoothstep = (a: number, b: number, v: number) => {
 };
 
 export class Buf {
-  data = new Uint8ClampedArray(W * H * 4);
+  readonly w = W * K;
+  readonly h = H * K;
+  data = new Uint8ClampedArray(this.w * this.h * 4);
 
-  put(x: number, y: number, c: RGB) {
-    x = Math.floor(x);
-    y = Math.floor(y);
-    if (x < 0 || y < 0 || x >= W || y >= H) return;
-    const i = (y * W + x) * 4;
+  private set(px: number, py: number, c: RGB) {
+    if (px < 0 || py < 0 || px >= this.w || py >= this.h) return;
+    const i = (py * this.w + px) * 4;
     this.data[i] = c[0];
     this.data[i + 1] = c[1];
     this.data[i + 2] = c[2];
     this.data[i + 3] = 255;
+  }
+
+  // One whole logical pixel.
+  put(x: number, y: number, c: RGB) {
+    const px = Math.floor(x) * K, py = Math.floor(y) * K;
+    for (let j = 0; j < K; j++) for (let i = 0; i < K; i++) this.set(px + i, py + j, c);
+  }
+
+  // One physical pixel at a logical position.
+  dot(x: number, y: number, c: RGB) {
+    this.set(Math.floor(x * K + 1e-6), Math.floor(y * K + 1e-6), c);
   }
 
   rect(x: number, y: number, w: number, h: number, c: RGB) {
@@ -47,9 +67,9 @@ export class Buf {
 
   // Vertical dithered gradient across `colors`, from y0 to y1.
   gradient(colors: RGB[], y0 = 0, y1 = H) {
-    for (let y = Math.max(0, Math.floor(y0)); y < Math.min(H, y1); y++) {
+    for (let y = Math.max(0, Math.floor(y0)); y < Math.min(H, y1); y += PX) {
       const v = (y - y0) / (y1 - y0);
-      for (let x = 0; x < W; x++) this.put(x, y, colors[dither(x, y, v, colors.length)]);
+      for (let x = 0; x < W; x += PX) this.dot(x, y, colors[dither(x, y, v, colors.length)]);
     }
   }
 }
@@ -57,10 +77,10 @@ export class Buf {
 // Ordered-dither dissolve between two frames: t=0 shows a, t=1 shows b.
 export const dissolve = (a: Buf, b: Buf, t: number) => {
   const out = new Buf();
-  for (let y = 0; y < H; y++)
-    for (let x = 0; x < W; x++) {
-      const src = t > bayer(x >> 1, y >> 1) ? b : a;
-      const i = (y * W + x) * 4;
+  for (let py = 0; py < out.h; py++)
+    for (let px = 0; px < out.w; px++) {
+      const src = t > (BAYER[(py >> 1) & 3][(px >> 1) & 3] + 0.5) / 16 ? b : a;
+      const i = (py * out.w + px) * 4;
       out.data[i] = src.data[i];
       out.data[i + 1] = src.data[i + 1];
       out.data[i + 2] = src.data[i + 2];

@@ -1,4 +1,4 @@
-import { Buf, H, RGB, W, clamp01, dither, fbm, hex, lerp, ramp, sprite } from "./pixel";
+import { Buf, H, PX, RGB, W, clamp01, dither, fbm, hex, lerp, ramp, sprite } from "./pixel";
 import { P } from "./palette";
 
 const MOON = ramp(["#2a2838", "#55526a", "#8f8ca4", "#c9c6d8", "#f0eef8"]);
@@ -10,9 +10,9 @@ const LIGHT = (() => {
 
 // Shaded, cratered pixel Moon.
 export const drawMoon = (buf: Buf, cx: number, cy: number, r: number, rot: number) => {
-  for (let y = Math.max(0, Math.floor(cy - r - 2)); y < Math.min(H, cy + r + 2); y++)
-    for (let x = Math.max(0, Math.floor(cx - r - 2)); x < Math.min(W, cx + r + 2); x++) {
-      const nx = (x - cx + 0.5) / r, ny = (y - cy + 0.5) / r, d = nx * nx + ny * ny;
+  for (let y = Math.max(0, Math.floor(cy - r - 2)); y < Math.min(H, cy + r + 2); y += PX)
+    for (let x = Math.max(0, Math.floor(cx - r - 2)); x < Math.min(W, cx + r + 2); x += PX) {
+      const nx = (x - cx + PX / 2) / r, ny = (y - cy + PX / 2) / r, d = nx * nx + ny * ny;
       if (d > 1) continue;
       const nz = Math.sqrt(1 - d);
       const lon = Math.atan2(nx, nz) + rot, lat = Math.asin(ny);
@@ -21,7 +21,7 @@ export const drawMoon = (buf: Buf, cx: number, cy: number, r: number, rot: numbe
       const mare = fbm(px * 1.6 + 9, py * 1.6, pz * 1.6) > 0.55 ? -0.18 : 0;
       const diff = Math.max(0, nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2]);
       const rim = crater > 0.62 ? 0.15 : crater < 0.38 ? -0.15 : 0;
-      buf.put(x, y, MOON[dither(x, y, clamp01(0.08 + 0.9 * diff + rim + mare), MOON.length)]);
+      buf.dot(x, y, MOON[dither(x, y, clamp01(0.08 + 0.9 * diff + rim + mare), MOON.length)]);
     }
 };
 

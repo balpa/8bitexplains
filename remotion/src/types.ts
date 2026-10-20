@@ -6,6 +6,7 @@ export type Scene = {
   sub: string;
   stat?: string;
   statLabel?: string;
+  statLine?: number;
   items?: string[];
   reveal?: { main: string; sub: string; line: number };
   vo: string[];
@@ -14,4 +15,4 @@ export type Scene = {
   lines: Line[];
 };
 
-export type Manifest = { id: string; title: string; fps: number; scenes: Scene[] };
+export type Manifest = { id: string; title: string; fps: number; detail?: number; scenes: Scene[] };

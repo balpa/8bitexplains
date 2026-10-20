@@ -18,6 +18,9 @@ LUFS_RANGE = (-15.0, -13.0)
 TRUE_PEAK_MAX = -1.0
 DURATION_RANGE = (45.0, 60.0)
 MIN_SPEECH_OVER_GAP_DB = 6.0
+FIRST_WORD_MAX_S = 0.35
+WPM_RANGE = (160.0, 200.0)
+CTA_PAUSE_S = 0.8
 SHEET_EVERY_S = 2.5
 
 
@@ -77,6 +80,25 @@ def scene_balance(manifest: dict, mono: np.ndarray, sr: int) -> list[dict]:
     return rows
 
 
+def script_checks(manifest: dict) -> list[tuple[str, bool]]:
+    """Retention rules (learnings L15) and the aftermath beat (L11) that can be read off the manifest."""
+    fps, scenes = manifest["fps"], manifest["scenes"]
+    first = scenes[0]["lines"][0]["startFrame"] / fps
+    lines = [l for s in scenes for l in s["lines"]]
+    words = sum(len(l["text"].split()) for l in lines)
+    voiced = sum(l["endFrame"] - l["startFrame"] for l in lines) / fps
+    wpm = words / voiced * 60 if voiced else 0.0
+    aftermath = len(scenes) >= 2 and scenes[-2].get("beat") == "aftermath"
+    outro = scenes[-1]["lines"]
+    pause = (outro[-1]["startFrame"] - outro[-2]["endFrame"]) / fps if len(outro) >= 2 else 0.0
+    return [
+        (f"first word at {first:.2f}s (<= {FIRST_WORD_MAX_S}s)", first <= FIRST_WORD_MAX_S),
+        (f"speech rate {wpm:.0f} wpm in {WPM_RANGE}", WPM_RANGE[0] <= wpm <= WPM_RANGE[1]),
+        ("aftermath scene right before the save point", aftermath),
+        (f"pause before the follow line >= {CTA_PAUSE_S}s", pause >= CTA_PAUSE_S),
+    ]
+
+
 def grid(count: int, cols: int) -> tuple[int, int]:
     return cols, (count + cols - 1) // cols
 
@@ -117,6 +139,7 @@ def main(mp4_path: str, manifest_path: str) -> int:
         (f"loudness {lufs:.1f} LUFS in {LUFS_RANGE}", LUFS_RANGE[0] <= lufs <= LUFS_RANGE[1]),
         (f"true peak {peak:.1f} dBTP below {TRUE_PEAK_MAX}", peak < TRUE_PEAK_MAX),
         (f"voice >= {MIN_SPEECH_OVER_GAP_DB:.0f} dB over background in every scene", all(r["ok"] for r in balance)),
+        *script_checks(manifest),
     ]
     sheet = mp4.with_name(f"{ep}-contact.png")
     contact_sheet(mp4, info["duration"], sheet)

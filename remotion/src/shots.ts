@@ -5,6 +5,9 @@ import { PlanetOpts, drawOcean, drawPlanet, drawSpace, drawUnderwater, project }
 import { EP002_SHOTS } from "./shots-ep002";
 import { EP003_SHOTS } from "./shots-ep003";
 import { EP004_SHOTS, ep004Shake } from "./shots-ep004";
+import { EP005_SHOTS, ep005Shake } from "./shots-ep005";
+import { EP006_SHOTS, ep006Shake } from "./shots-ep006";
+import { EP007_SHOTS, ep007Shake } from "./shots-ep007";
 import { Shot, ShotCtx, lineStart, split } from "./shot-kit";
 
 export type { ShotCtx } from "./shot-kit";
@@ -78,12 +81,16 @@ const outro: Shot = (buf, c) => {
   drawBird(buf, 118, 182 + Math.sin(c.t * 3) * 3, c.frame, true);
 };
 
-export const SHOTS: Record<string, Shot> = { hook, normal, elnino, stat, effects, fact, outro, ...EP002_SHOTS, ...EP003_SHOTS, ...EP004_SHOTS };
+export const SHOTS: Record<string, Shot> = { hook, normal, elnino, stat, effects, fact, outro, ...EP002_SHOTS, ...EP003_SHOTS, ...EP004_SHOTS, ...EP005_SHOTS, ...EP006_SHOTS, ...EP007_SHOTS };
+
+const EPISODE_SHAKES = [ep004Shake, ep005Shake, ep006Shake, ep007Shake];
 
 // Screen shake in output pixels: the thermometer slam in the hook.
 export const shakeAt = (visual: string, c: ShotCtx) => {
-  const other = ep004Shake(visual, c);
-  if (other) return other;
+  for (const shake of EPISODE_SHAKES) {
+    const s = shake(visual, c);
+    if (s) return s;
+  }
   if (visual !== "hook") return { x: 0, y: 0 };
   const k = clamp01(1 - (c.t - SLAM) / 0.4);
   if (c.t < SLAM || k <= 0) return { x: 0, y: 0 };
