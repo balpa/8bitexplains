@@ -1,6 +1,6 @@
 # Status and next steps
 
-Read this first when resuming on another machine. Updated 2026-10-20.
+Read this first when resuming on another machine. Updated 2026-10-26.
 
 ## Where we are
 
@@ -24,7 +24,14 @@ Read this first when resuming on another machine. Updated 2026-10-20.
      3.5 s and 2.5 s. ep007 keeps the 19-token line "That bang is thunder." (the longer version
      ran 60.3 s). Ready to post.
 2. **Owner posts** ep005-ep007 with the checklist; `docs/data/posts.csv` starts.
-3. **Audio arc** (Priority 3), then **visual craft** (Priority 4), one at a time, checked against
+3. **Catchiness** (owner, 2026-10-26: "nice, but needs to be catchy"). Research done in
+   docs/research/catchiness.md. The owner chose humour first (L24) and then dropped death tolls
+   for everyday-life effects (L25). On 2026-10-26 ep005-ep007 were reworked with bird gags and
+   new aftermaths: ep005 "the lake that burped" (pipe plus fertile soil, "every fizzing soda is a
+   tiny Lake Nyos"), ep006 GPS, radio and the 1859 aurora you could read by, ep007 the
+   flash-to-bang count. Topic and visual review with ten new "you" topics:
+   docs/research/topics-and-visuals.md. The other catchiness proposals are still open.
+4. **Audio arc** (Priority 3), then **visual craft** (Priority 4), one at a time, checked against
    the data.
 
 ## Setting up a new machine

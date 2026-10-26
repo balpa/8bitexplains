@@ -3,6 +3,29 @@
 Rules distilled from the owner's feedback. Newest first. Each rule says where it came from.
 These override docs/style/style-guide.md when they disagree.
 
+## 2026-10-26 (ep005-ep007 v2 review)
+
+- **L23 Keep the v2 build, add catchiness on top.** The owner found ep005-ep007 nice overall, so
+  their look, pacing and depth (L14-L22) stay. Retention alone is not enough: every episode also
+  needs a reason to send it, comment and follow. docs/research/catchiness.md lists the levers
+  (second-person framing, a guess before the peak, an awe peak, a usable takeaway, a series name,
+  a bird gag). Until the owner picks from it, a new episode at least names in its plan which of
+  those levers it uses.
+- **L24 Make it witty, about the science.** The owner wants humour in every episode. Related
+  humour helped motivation and recall in a video-lecture study, unrelated jokes did nothing
+  (docs/research/catchiness.md §5). So every joke shows the mechanism happening to someone:
+  the bird is the victim or the witness (zapped by the strike it is learning about, puffed up by
+  static, blown away by the pressure wave). Each episode has at least three bird gags, one of
+  them in the first 3 s, and the outro calls back to the hook gag. At most two dry witty lines in
+  the voice-over, and only when they replace words, never add time. No jokes in the scenes about
+  deaths or victims; there the bird is serious.
+- **L25 Effects from everyday life, not death tolls.** The owner does not want "1,800 people
+  died" as the payoff. The aftermath (L11) gives one or two sourced, concrete facts about how the
+  topic shows up in real life: something the viewer can notice, use or compare (count flash to
+  bang and divide by five; one flash could light a bulb for three months). A death toll is never
+  the aftermath or the closer, and it appears at all only when the topic cannot be told without
+  it. Pick the fact per topic; the question is "where does this touch my life?".
+
 ## 2026-10-20 (improvement plan, Priority 2)
 
 Research-backed guards the owner approved with the plan (docs/research/improvement-plan.md).
@@ -82,8 +105,8 @@ Research-backed guards the owner approved with the plan (docs/research/improveme
   needs no background to be interesting. A trending story is used only if it also passes this.
 - **L11 End on the consequence.** Never stop on the mechanism. Before the save point, every
   episode has an aftermath beat (its own scene, 1-2 lines, an on-screen number) with concrete,
-  sourced consequences: people killed or affected, damage, the regions hit, what changed
-  afterwards, or what it means for the viewer. Topics without harm end on what it changed or what
+  sourced consequences: what changed afterwards or what it means for the viewer (L25 replaces
+  the death-toll option). Topics without harm end on what it changed or what
   it means for you.
 
 ## 2026-10-19 (ep001 v3 direction)

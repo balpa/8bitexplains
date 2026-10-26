@@ -1,10 +1,18 @@
-import { clamp01, lerp, smoothstep } from "./engine/pixel";
+import { Buf, clamp01, lerp, smoothstep } from "./engine/pixel";
+import { Camera, toScreen } from "./engine/fine";
 import { LAKE_C, drawGeoCut, drawNyos, drawSoda } from "./engine/nyos";
-import { drawBird, drawFloppy } from "./engine/sprites";
+import { drawBird, drawBirdAs, drawFloppy } from "./engine/sprites";
 import { Shot, ShotCtx, lineStart, split } from "./shot-kit";
 
 // Lake Nyos, Cameroon, 21 August 1986 (NASA Earth Observatory).
 
+// The bird riding the degassing fountain, 21 logical px tall at scale 3.
+const onFountain = (buf: Buf, c: ShotCtx, cam: Camera, flinch: boolean) => {
+  const p = toScreen(cam, LAKE_C.x, LAKE_C.y - 30 * (0.92 + 0.08 * Math.sin(c.t * 9)));
+  drawBirdAs(buf, p.x - 16, p.y - 19, c.frame, flinch ? "puffed" : "shades", false, 3);
+};
+
+const BURP = 0.9;
 const hook: Shot = (buf, c) => {
   const pull = smoothstep(0, 2.6, c.t), push = smoothstep(3.2, c.dur, c.t);
   drawNyos(buf, {
@@ -13,7 +21,12 @@ const hook: Shot = (buf, c) => {
     bulge: lerp(0.45, 1, smoothstep(0, 1.1, c.t)),
     cloud: smoothstep(0.6, c.dur, c.t) * 0.42,
   });
-  drawBird(buf, lerp(150, 128, pull), 96 + Math.sin(c.t * 3) * 3, c.frame, true, 2, c.t > 1);
+  // Gag (L24): the lake burps and blows the bird head over heels.
+  const blown = smoothstep(BURP, BURP + 0.7, c.t);
+  const bx = lerp(140, 122, pull) + 14 * blown, by = 120 + Math.sin(c.t * 3) * 3 - 16 * blown + 12 * smoothstep(1.8, 3, c.t);
+  if (c.t < BURP) drawBird(buf, bx, by, c.frame, true, 3);
+  else if (c.t < BURP + 0.9) drawBirdAs(buf, bx, by, c.frame, "puffed", Math.floor(c.frame / 3) % 2 === 0, 3);
+  else drawBird(buf, bx, by, c.frame, true, 3, true);
 };
 
 const magma: Shot = (buf, c) => {
@@ -25,8 +38,13 @@ const soda: Shot = (buf, c) => {
   const popAt = c.dur - 0.9;
   const push = smoothstep(0.3, popAt, c.t), back = smoothstep(popAt, popAt + 0.5, c.t);
   const cam = { x: 90, y: lerp(lerp(160, 96, push), 120, back), zoom: lerp(lerp(1, 1.9, push), 1.15, back) };
-  drawSoda(buf, c.t, smoothstep(0, popAt, c.t), clamp01((c.t - popAt) / 1.0), cam);
-  if (c.t > popAt) drawBird(buf, 130, 150 + Math.sin(c.t * 9) * 2, c.frame, true, 2, true);
+  const pop = clamp01((c.t - popAt) / 1.0);
+  drawSoda(buf, c.t, smoothstep(0, popAt, c.t), pop, cam);
+  // Gag: the bird leans on the neck, sweating as the pressure builds, and the pop blows it away.
+  const neck = toScreen(cam, 104, 104);
+  const bx = neck.x - 4 + pop * 90, by = neck.y - 20 - pop * 40;
+  if (pop <= 0) drawBird(buf, bx, by, c.frame, true, 3, c.t > popAt - 2.5);
+  else drawBirdAs(buf, bx, by, c.frame, "puffed", Math.floor(c.frame / 3) % 2 === 0, 3);
 };
 
 // The deep water rises (cut-away), then the gas bursts out at "burst out at once" (surface).
@@ -51,15 +69,23 @@ const village: Shot = (buf, c) => {
 
 const pipes: Shot = (buf, c) => {
   const k = smoothstep(0, c.dur, c.t);
-  drawNyos(buf, { t: c.t, cam: { x: lerp(60, 112, k), y: lerp(160, 196, k), zoom: lerp(2, 1.1, k) }, dawn: 1, fountain: smoothstep(0, 1, c.t) });
-  drawBird(buf, lerp(20, 60, k), 104 + Math.sin(c.t * 3) * 3, c.frame, false, 2);
+  const cam = { x: lerp(60, 112, k), y: lerp(160, 196, k), zoom: lerp(2, 1.1, k) };
+  const jet = smoothstep(0, 1, c.t);
+  drawNyos(buf, { t: c.t, cam, dawn: 1, fountain: jet });
+  // Gag: once the headline gives way to the reveal, the bird surfs the jet in sunglasses.
+  const surf = lineStart(c, 1, 3.5) - 0.2;
+  if (c.t >= surf) onFountain(buf, c, cam, false);
+  else drawBird(buf, lerp(10, 44, smoothstep(0, surf, c.t)), 124 + Math.sin(c.t * 3) * 3, c.frame, false, 3);
 };
 
 const outro: Shot = (buf, c) => {
   const k = smoothstep(0, 2.2, c.t);
-  drawNyos(buf, { t: c.t, cam: { x: LAKE_C.x, y: LAKE_C.y - 4 * k, zoom: lerp(1.6, 2.3, k) }, dawn: 1, fountain: 1 });
+  const cam = { x: LAKE_C.x, y: LAKE_C.y - 4 * k, zoom: lerp(1.6, 2.3, k) };
+  drawNyos(buf, { t: c.t, cam, dawn: 1, fountain: 1 });
   drawFloppy(buf, 70, 96);
-  drawBird(buf, 118, 182 + Math.sin(c.t * 3) * 3, c.frame, true);
+  // Callback to the hook: each little burp from the jet still makes the bird jump.
+  const burp = (c.t % 2.6) > 1.8 && (c.t % 2.6) < 2.3;
+  drawBirdAs(buf, 116, 176 + Math.sin(c.t * 3) * 3, c.frame, burp ? "puffed" : "shades", true, 3);
 };
 
 export const EP005_SHOTS: Record<string, Shot> = {

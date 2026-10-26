@@ -29,8 +29,8 @@ review again. Add a line here whenever a logged critique slips through.
 - [ ] The mechanism is shown once as an everyday metaphor before the real view (L10).
 - [ ] At most one short SFX per scene, none on top of a word (L6).
 - [ ] The script does not end on the mechanism: an aftermath scene with sourced, concrete
-      consequences (people, damage, regions, what changed, what it means for you) comes right
-      before the save point (L11).
+      real-life effects (what you can notice, use or compare, what changed) comes right before
+      the save point (L11). No death toll in the aftermath or the closer (L25).
 - [ ] The hook works with no background: a popular question or a "wait, what?" fact with one
       concrete number or image (L12).
 - [ ] No look from docs/style/visual-ledger.md is reused as-is; compare the contact sheet with
@@ -49,4 +49,7 @@ review again. Add a line here whenever a logged critique slips through.
 - [ ] `out/<id>-cover.png` exists; in `out/grid-preview.png` the title reads at grid size and the
       series looks consistent (L20).
 - [ ] The caption's first line is the searchable question (L22).
+- [ ] At least three bird gags, each one the science happening to the bird; one in the first
+      3 s, the outro calls back to it, none in the deaths scene; the bird reads at phone size
+      (scale 3) (L24).
 - [ ] Every rule in docs/style/learnings.md is satisfied; name any you are unsure about.

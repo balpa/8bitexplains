@@ -2,6 +2,17 @@
 
 Raw feedback from the owner, newest first, with what was changed in response.
 
+## 2026-10-26 · ep005-ep007 v2 (re-rendered 2026-10-20)
+
+- "These videos were nice overall, but we need to add things so they are catchy." -> L23
+- Asked for research: what kind of videos get watched most, and what to pack into a video to get
+  a return (sends, comments, follows). -> docs/research/catchiness.md; its proposals wait for the
+  owner's choice before they become rules.
+- On the catchiness proposals: "There should be something witty in it." -> L24
+- "We don't have to say things like '1,800 people died'. We just give real-life information
+  about the topic's effect. That's my general idea; we adapt it to each video's topic." -> L25
+  (replaces the death-toll part of L11)
+
 ## 2026-10-20 · improvement plan (docs/research/improvement-plan.md)
 
 - Asked what could be improved in the videos, then: "do whatever research is needed". ->

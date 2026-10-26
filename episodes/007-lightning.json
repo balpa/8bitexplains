@@ -9,11 +9,10 @@
     "NOAA National Weather Service Fort Worth, Lightning: Did you know? (public domain) - https://www.weather.gov/fwd/lightdidyouknow",
     "NOAA National Weather Service, Understanding Lightning: Thunder (public domain) - https://www.weather.gov/safety/lightning-science-thunder",
     "NOAA National Weather Service, Understanding Lightning: Overview (public domain) - https://www.weather.gov/safety/lightning-science-overview",
-    "NOAA National Weather Service, How Dangerous is Lightning? (public domain) - https://www.weather.gov/safety/lightning-odds",
     "NOAA National Severe Storms Laboratory, Severe Weather 101: Lightning (public domain) - https://www.nssl.noaa.gov/education/svrwx101/lightning/",
     "NOAA National Severe Storms Laboratory, Lightning FAQ (public domain) - https://www.nssl.noaa.gov/education/svrwx101/lightning/faq/"
   ],
-  "caption": "How is lightning hotter than the Sun?\nLightning is 5 times hotter than the surface of the Sun ⚡ Where the charge comes from, why thunder booms, and what lightning costs us, in 8-bit.\n\nSources (public domain, NOAA):\n- Lightning: Did you know?\n- Understanding Lightning: Thunder\n- Understanding Lightning: Overview\n- How Dangerous is Lightning?\n- NOAA NSSL, Severe Weather 101: Lightning and Lightning FAQ\n\nNot affiliated with or endorsed by NOAA or the National Weather Service.\n\n#lightning #weather #science #howitworks #8bit",
+  "caption": "How is lightning hotter than the Sun?\nLightning is 5 times hotter than the surface of the Sun ⚡ Where the charge comes from, why thunder booms, and how to tell how far away it struck, in 8-bit.\n\nSources (public domain, NOAA):\n- Lightning: Did you know?\n- Understanding Lightning: Thunder\n- Understanding Lightning: Overview\n- NOAA NSSL, Severe Weather 101: Lightning and Lightning FAQ\n\nNot affiliated with or endorsed by NOAA or the National Weather Service.\n\n#lightning #weather #science #howitworks #8bit",
   "cover": {
     "title": "HOTTER THAN THE SUN",
     "scene": "bolt-strike",
@@ -36,7 +35,7 @@
       "title": "LEVEL 1",
       "sub": "THE CHARGE",
       "vo": [
-        "Inside a storm cloud, rising air smashes ice and small hail together.",
+        "In a storm cloud, rising air smashes ice and hail together.",
         "Light ice turns positive and rides up. Heavy hail turns negative and sinks."
       ]
     },
@@ -58,11 +57,10 @@
       "stat": "50,000°F",
       "statLabel": "5X THE SUN'S SURFACE",
       "vo": [
-        "One flash carries about a hundred million volts.",
-        "Its energy heats the air in its path in a few millionths of a second, to fifty thousand degrees Fahrenheit.",
+        "It heats the air in its path to fifty thousand degrees Fahrenheit, in millionths of a second.",
         "Five times the Sun's surface."
       ],
-      "statLine": 1
+      "statLine": 0
     },
     {
       "visual": "bolt-balloon",
@@ -71,7 +69,7 @@
       "sub": "THE BOOM",
       "vo": [
         "Air heated that fast explodes outward, like a popping balloon.",
-        "That bang is thunder."
+        "That bang is thunder: the sky popping its balloon."
       ]
     },
     {
@@ -88,15 +86,15 @@
     {
       "visual": "bolt-people",
       "beat": "aftermath",
-      "title": "AFTERMATH",
-      "sub": "IN THE US",
+      "title": "TRY THIS",
+      "sub": "FLASH TO BANG",
       "reveal": {
-        "main": "27 DEATHS A YEAR",
-        "sub": "US AVERAGE, 2009-2018",
+        "main": "5 SECONDS = 1 MILE",
+        "sub": "COUNT FROM FLASH TO BANG",
         "line": 0
       },
       "vo": [
-        "And lightning killed about twenty-seven Americans a year from two thousand nine to twenty eighteen."
+        "Count the seconds from flash to bang, then divide by five: that's how many miles away it struck."
       ]
     },
     {
@@ -105,7 +103,7 @@
       "title": "SAVE POINT",
       "sub": "SAVE THIS ONE",
       "vo": [
-        "When thunder roars, go indoors.",
+        "Hear thunder? You're in range. Go indoors.",
         "Follow Eight Bit Explains."
       ]
     }

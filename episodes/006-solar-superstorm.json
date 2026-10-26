@@ -13,7 +13,7 @@
     "NOAA Space Weather Prediction Center, Electric Power Transmission (public domain) - https://www.spaceweather.gov/impacts/electric-power-transmission",
     "U.S. Energy Information Administration, How electricity is generated (public domain) - https://www.eia.gov/energyexplained/electricity/how-electricity-is-generated.php"
   ],
-  "caption": "Could a solar storm take down the power grid?\nIn 1859 the Sun set telegraph machines on fire ☀️⚡ How a solar storm reaches Earth, what it did to Quebec in 1989, and what one could cost today, in 8-bit.\n\nSources (public domain, NOAA, NASA and EIA):\n- NOAA NESDIS, When Solar Storms Attack\n- NOAA NWS, Space Weather safety\n- NASA, Near Miss: The Solar Superstorm of July 2012\n- NOAA SWPC, Coronal Mass Ejections\n- NOAA SWPC, Electric Power Transmission\n- U.S. EIA, How electricity is generated\n\nNot affiliated with or endorsed by NOAA, NASA or the EIA.\n\n#space #sun #solarstorm #howitworks #8bit",
+  "caption": "Could a solar storm take down the power grid?\nIn 1859 the Sun set telegraph machines on fire ☀️⚡ How a solar storm reaches Earth, what it did to Quebec in 1989, and what you'd notice if one hit today, in 8-bit.\n\nSources (public domain, NOAA, NASA and EIA):\n- NOAA NESDIS, When Solar Storms Attack\n- NOAA NWS, Space Weather safety\n- NASA, Near Miss: The Solar Superstorm of July 2012\n- NOAA SWPC, Coronal Mass Ejections\n- NOAA SWPC, Electric Power Transmission\n- U.S. EIA, How electricity is generated\n\nNot affiliated with or endorsed by NOAA, NASA or the EIA.\n\n#space #sun #solarstorm #howitworks #8bit",
   "cover": {
     "title": "SOLAR STORM",
     "scene": "sun-office",
@@ -84,13 +84,16 @@
       "visual": "sun-blackout",
       "beat": "aftermath",
       "title": "IF IT HITS",
-      "sub": "THE COST TODAY",
-      "stat": "$2 TRILLION",
-      "statLabel": "20 TIMES HURRICANE KATRINA",
+      "sub": "WHAT YOU'D NOTICE",
       "vo": [
-        "A direct hit today could cost two trillion dollars and black out up to forty million Americans for weeks,",
-        "since giant transformers can take years to repair."
-      ]
+        "Today it would scramble GPS and radio, and could cut power for weeks.",
+        "But in eighteen fifty-nine, the aurora was bright enough to read a newspaper by."
+      ],
+      "reveal": {
+        "main": "SEEN FROM CUBA",
+        "sub": "THE 1859 AURORA",
+        "line": 1
+      }
     },
     {
       "visual": "sun-outro",
