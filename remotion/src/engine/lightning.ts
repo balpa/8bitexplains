@@ -158,6 +158,13 @@ export const drawCloudInside = (buf: Buf, t: number, smash: number, sep: number)
         return d < 1 ? pick(ramp(["#4a5070", "#8a90b0", "#d0d6ec"]), px, py, 0.9 - d * 0.5 - (px - x + py - y) / 12) : null;
       }, x - 5, y - 5, x + 6, y + 6);
       if (sep > 0.3) for (let k = -1.5; k <= 1.5; k += PX) buf.dot(x + 7 + k, y - 6, minus);
+      // Grumpy hail (L28 faces on things): two eyes and a frown once the charges split.
+      if (sep > 0.3 && i % 4 === 1) {
+        const ink = hex("#05040f");
+        buf.dot(x - 1.5, y - 0.5, ink); buf.dot(x + 1, y - 0.5, ink);
+        buf.dot(x - 2, y - 1.5, ink); buf.dot(x + 1.5, y - 1.5, ink);
+        buf.dot(x - 0.5, y + 1.5, ink); buf.dot(x, y + 1.5, ink);
+      }
     }
   }
   if (smash > 0) {
@@ -190,6 +197,13 @@ export const drawBalloon = (buf: Buf, t: number, pop: number, grow = 1) => {
       return spec ? BALLOON[4] : pick(BALLOON, x, y, light);
     }, cx - r, cy - r * 1.2, cx + r + 1, cy + r * 1.2);
     fineLine(buf, cx - 3, cy + r * 1.15, cx + 3, cy + r * 1.15, BALLOON[1], 2.4);
+    // The balloon watches the spark coming, eyes widening (L28 faces on things).
+    const fear = smoothstep(0.6, 1, grow), ink = hex("#05040f"), white = hex("#f4f1e8");
+    for (const dx of [-7, 5]) {
+      buf.rect(cx + dx, cy - 6, 3, 3 + Math.round(fear * 2), white);
+      buf.put(cx + dx + 1 - Math.round(fear), cy - 5 + Math.round(fear), ink);
+    }
+    if (fear > 0.5) buf.rect(cx + 14, cy - 10 + ((t * 20) % 6), 1, 2, hex("#3ee0ff"));
     for (let y = cy + r * 1.18; y < 300; y += PX) buf.dot(cx + Math.sin(y / 9 + t * 2) * 3, y, hex("#c8c0d8"));
     if (grow > 0.75) {
       const k = (grow - 0.75) / 0.25;
@@ -238,3 +252,65 @@ export const drawChannel = (buf: Buf, t: number, heat: number, sunK: number, cam
 };
 
 export const SHOCK = (buf: Buf, x: number, y: number, t: number) => drawRings(buf, x, y, t, hex("#d8d4ff"), 160, 3, 0.6);
+
+// Heat ladder (L28): a kettle, lava, the Sun and a bolt on bars that grow with their temperature,
+// each with a face and its number on a pill. `grow` holds each bar's progress in [0, 1].
+const LADDER_BG = ramp(["#2a1648", "#5a2470", "#a8336f", "#e0603e", "#ff9a4a"]);
+const BARS = [
+  { x: 30, h: 22, label: "212°F", col: ramp(["#1f55b5", "#4fa3ff", "#bfe6ff"]) },
+  { x: 70, h: 46, label: "2,000°F", col: ramp(["#8f1f1a", "#e0453a", "#ff8a3d"]) },
+  { x: 110, h: 84, label: "10,000°F", col: ramp(["#e08a1a", "#ffd23f", "#fff2b0"]) },
+  { x: 150, h: 190, label: "50,000°F", col: ramp(["#6a4ad0", "#b8a0ff", "#ffffff"]) },
+];
+const BASE = 200;
+
+const eyes = (buf: Buf, x: number, y: number, mood: "sweat" | "smug" | "angry" | "cool") => {
+  const ink = hex("#05040f"), white = hex("#f4f1e8");
+  if (mood === "cool") {
+    buf.rect(x - 6, y, 13, 2, ink);
+    buf.rect(x - 6, y + 2, 5, 2, ink);
+    buf.rect(x + 2, y + 2, 5, 2, ink);
+    buf.put(x - 5, y, white);
+    return;
+  }
+  for (const dx of [-4, 3]) {
+    buf.rect(x + dx, y, 2, 2, white);
+    buf.put(x + dx + (mood === "smug" ? 1 : 0), y + 1, ink);
+  }
+  if (mood === "angry") { buf.rect(x - 5, y - 2, 3, 1, ink); buf.rect(x + 4, y - 2, 3, 1, ink); }
+  if (mood === "smug") { buf.rect(x - 4, y, 2, 1, ink); buf.rect(x + 3, y, 2, 1, ink); }
+};
+
+export const drawLadder = (buf: Buf, t: number, grow: number[], label: (number | null)[], drawNumber: (buf: Buf, text: string, cx: number, cy: number, color?: string, scale?: number) => void) => {
+  shadeAll(buf, (x, y) => pick(LADDER_BG, x, y, 0.15 + y / 260 + 0.04 * Math.sin(x / 9 + t * 2)));
+  const FLOOR = ramp(["#3a1d5c", "#7a2c6a", "#c04a4e", "#e0703e"]);
+  shadeAll(buf, (x, y) => (y >= BASE ? pick(FLOOR, x, y, 0.85 - (y - BASE) / 140 + 0.06 * Math.sin(x / 5)) : null), 0, BASE, W, H);
+  BARS.forEach((b, i) => {
+    const g = clamp01(grow[i]);
+    if (g <= 0) return;
+    const top = BASE - b.h * g;
+    shadeAll(buf, (x, y) => (Math.abs(x - b.x) < 10 && y >= top && y < BASE ? pick(b.col, x, y, 0.3 + (b.x - x) / -30 + 0.3) : null), b.x - 11, Math.max(0, top), b.x + 11, BASE);
+    if (i === 3) glow(buf, b.x, Math.max(10, top), 26, hex("#d8d4ff"), 0.7 * g);
+    const oy = Math.max(14, top - 12);
+    if (i === 0) {
+      buf.rect(b.x - 8, oy - 4, 16, 12, hex("#c9d4f0"));
+      buf.rect(b.x + 8, oy - 1, 4, 2, hex("#c9d4f0"));
+      buf.rect(b.x - 3, oy - 7, 6, 3, hex("#05040f"));
+      for (let k = 0; k < 3; k++) buf.put(b.x - 2 + k * 2 + Math.sin(t * 6 + k) , oy - 10 - ((t * 12 + k * 4) % 8), hex("#f4f1e8"));
+      eyes(buf, b.x, oy, "sweat");
+      buf.rect(b.x - 9, oy - 2 + ((t * 20) % 6), 1, 2, hex("#3ee0ff"));
+    } else if (i === 1) {
+      shadeAll(buf, (x, y) => (Math.hypot((x - b.x) / 11, (y - oy) / 8) < 1 ? pick(ramp(["#8f1f1a", "#e0453a", "#ffb347"]), x, y, 0.8 - (y - oy) / 16) : null), b.x - 12, oy - 9, b.x + 12, oy + 9);
+      eyes(buf, b.x, oy - 2, "smug");
+    } else if (i === 2) {
+      glow(buf, b.x, oy, 20, hex("#ffd23f"), 0.6);
+      shadeAll(buf, (x, y) => (Math.hypot(x - b.x, y - oy) < 10 ? pick(ramp(["#ff8a3d", "#ffd23f", "#fff2b0"]), x, y, 0.9 - Math.hypot(x - b.x + 3, y - oy + 3) / 16) : null), b.x - 11, oy - 11, b.x + 11, oy + 11);
+      eyes(buf, b.x, oy - 2, "cool");
+    } else {
+      drawBolt(buf, makeBolt(Math.floor(t * 12), b.x - 4, Math.max(2, top - 30), b.x + 3, Math.max(20, top), 4, 1), 1, hex("#9a8aff"), hex("#ffffff"), 1.6);
+      eyes(buf, b.x, Math.max(16, top + 10), "angry");
+    }
+    const at = label[i];
+    if (at !== null && at !== undefined && t >= at) drawNumber(buf, b.label, i === 3 ? 118 : b.x, i === 3 ? 44 : Math.max(30, oy - 22), i === 3 ? "#ffd23f" : "#f4f1e8", i === 3 ? 2 : 1);
+  });
+};

@@ -14,14 +14,14 @@ FPS = 30
 LEAD_S = 0.3
 GAP_S = 0.2
 TAIL_S = 0.45
-OUTRO_PAUSE_S = 1.0
+LOOP_HOLD_S = 0.5
 
 
 def gaps_after(scene: dict) -> list[float]:
-    """Silence after each line; the outro holds a beat after the takeaway, before the follow line."""
+    """Silence after each line; the outro holds a beat while the hook title returns for the loop (L26)."""
     gaps = [GAP_S] * len(scene["vo"])
-    if scene.get("beat") == "outro" and len(gaps) >= 2:
-        gaps[-2] = OUTRO_PAUSE_S
+    if scene.get("beat") == "outro" and gaps:
+        gaps[-1] = LOOP_HOLD_S
     return gaps
 
 

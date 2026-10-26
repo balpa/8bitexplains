@@ -1,6 +1,6 @@
 {
   "id": "ep006",
-  "title": "When the Sun set telegraphs on fire",
+  "title": "The Sun can set your wires on fire",
   "voice": "am_michael",
   "speed": 1.2,
   "detail": 2,
@@ -13,7 +13,7 @@
     "NOAA Space Weather Prediction Center, Electric Power Transmission (public domain) - https://www.spaceweather.gov/impacts/electric-power-transmission",
     "U.S. Energy Information Administration, How electricity is generated (public domain) - https://www.eia.gov/energyexplained/electricity/how-electricity-is-generated.php"
   ],
-  "caption": "Could a solar storm take down the power grid?\nIn 1859 the Sun set telegraph machines on fire ☀️⚡ How a solar storm reaches Earth, what it did to Quebec in 1989, and what you'd notice if one hit today, in 8-bit.\n\nSources (public domain, NOAA, NASA and EIA):\n- NOAA NESDIS, When Solar Storms Attack\n- NOAA NWS, Space Weather safety\n- NASA, Near Miss: The Solar Superstorm of July 2012\n- NOAA SWPC, Coronal Mass Ejections\n- NOAA SWPC, Electric Power Transmission\n- U.S. EIA, How electricity is generated\n\nNot affiliated with or endorsed by NOAA, NASA or the EIA.\n\n#space #sun #solarstorm #howitworks #8bit",
+  "caption": "Could the Sun set your wires on fire?\nIn 1859 the Sun set telegraph machines on fire ☀️⚡ How a solar storm reaches Earth, what it did to Quebec in 1989, and what you'd notice if one hit today, in 8-bit.\n\nSources (public domain, NOAA, NASA and EIA):\n- NOAA NESDIS, When Solar Storms Attack\n- NOAA NWS, Space Weather safety\n- NASA, Near Miss: The Solar Superstorm of July 2012\n- NOAA SWPC, Coronal Mass Ejections\n- NOAA SWPC, Electric Power Transmission\n- U.S. EIA, How electricity is generated\n\nNot affiliated with or endorsed by NOAA, NASA or the EIA.\n\n#space #sun #solarstorm #howitworks #8bit",
   "cover": {
     "title": "SOLAR STORM",
     "scene": "sun-office",
@@ -23,11 +23,11 @@
     {
       "visual": "sun-hook",
       "beat": "hook",
-      "title": "THE SUN STARTED FIRES",
+      "title": "THE SUN VS YOUR WIRES",
       "sub": "SEPTEMBER 1859",
       "vo": [
-        "In eighteen fifty-nine, the Sun set telegraph machines on fire.",
-        "Could it happen to our power grid?"
+        "The Sun can set your wires on fire.",
+        "In eighteen fifty-nine, it did, to telegraphs. Could it take out your power?"
       ]
     },
     {
@@ -46,7 +46,7 @@
       "sub": "THE SHIELD",
       "vo": [
         "Earth's magnetic field is our umbrella.",
-        "A storm whose field points south shakes it harder."
+        "But a storm whose field points south shakes it harder."
       ]
     },
     {
@@ -56,7 +56,7 @@
       "sub": "THE CURRENT",
       "vo": [
         "A shaking magnetic field pushes current through long wires, the same trick a generator uses.",
-        "In eighteen fifty-nine, it shocked operators and set telegraphs on fire."
+        "That's how it shocked operators and lit those telegraphs."
       ]
     },
     {
@@ -64,8 +64,6 @@
       "beat": "peak",
       "title": "LEVEL 4",
       "sub": "QUEBEC, 1989",
-      "stat": "90 SECONDS",
-      "statLabel": "TO BLACK OUT 6 MILLION",
       "vo": [
         "In nineteen eighty-nine, a smaller storm overloaded transformers.",
         "Quebec's grid failed in ninety seconds, leaving six million people in the dark."
@@ -77,7 +75,7 @@
       "title": "THE ANSWER",
       "sub": "IT ALMOST DID",
       "vo": [
-        "In twenty twelve, a storm that strong missed us by about a week."
+        "But in twenty twelve, a storm that strong missed us by about a week."
       ]
     },
     {
@@ -98,11 +96,10 @@
     {
       "visual": "sun-outro",
       "beat": "outro",
-      "title": "SAVE POINT",
-      "sub": "SAVE THIS ONE",
+      "title": "ONE MORE THING",
+      "sub": "",
       "vo": [
-        "So satellites now watch the Sun.",
-        "Follow Eight Bit Explains."
+        "So satellites now watch the Sun, because"
       ]
     }
   ]

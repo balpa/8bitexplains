@@ -9,11 +9,13 @@ review again. Add a line here whenever a logged critique slips through.
 - [ ] Speech at least 6 dB above the background between lines in every scene (QA table);
       music ducked under the voice while it speaks (DUCKED in Episode.tsx, about 20 dB under).
 - [ ] Duration 45-60 s, 1080x1920, 30 fps, H.264 + AAC.
-- [ ] First word by 0.35 s, 160-200 wpm, aftermath scene right before the save point (QA script
+- [ ] First word by 0.35 s, 160-200 wpm, aftermath scene right before the outro (QA script
       checks).
 - [ ] No text outside the safe zone (x 90-990, y 220-1440).
-- [ ] No picture holds over 4 s before the save point; read the warnings for 3-4 s stretches
+- [ ] No picture holds over 4 s before the outro; read the warnings for 3-4 s stretches
       (L18).
+- [ ] Motion at least 10, brightness at least 50 with no scene under 30, and the last frame
+      returns to frame 0; the outro is one open-ended line with no follow line (L26, L30).
 - [ ] No short-line warnings, or each one listened to and kept on purpose (L21).
 
 ## By eye (from the contact sheet)
@@ -30,7 +32,7 @@ review again. Add a line here whenever a logged critique slips through.
 - [ ] At most one short SFX per scene, none on top of a word (L6).
 - [ ] The script does not end on the mechanism: an aftermath scene with sourced, concrete
       real-life effects (what you can notice, use or compare, what changed) comes right before
-      the save point (L11). No death toll in the aftermath or the closer (L25).
+      the outro (L11). No death toll in the aftermath or the closer (L25).
 - [ ] The hook works with no background: a popular question or a "wait, what?" fact with one
       concrete number or image (L12).
 - [ ] No look from docs/style/visual-ledger.md is reused as-is; compare the contact sheet with
@@ -43,8 +45,16 @@ review again. Add a line here whenever a logged critique slips through.
 - [ ] Script depth (L16): the hook asks how or why and the answer beat answers it; 3-4 causal
       links; every outcome verb has its cause next to it; at most 2 technical terms, each glossed;
       the metaphor is mapped explicitly.
-- [ ] The outro has the takeaway and "Follow Eight Bit Explains." as two lines, with a 1 s pause
-      between them (L17, QA checks this).
+- [ ] The outro's line ends open and reads on into the first line ("...and remember: the
+      lightning you see..."); no floppy, "GAME SAVED" or follow line (L26).
+- [ ] Hook (L27): frame 0 shows the subject in its problem state, centred and at least half the
+      frame wide, already moving; the first line is the title in the second person and ends by
+      3 s; the picture changes 3-4 times in the first 3 s.
+- [ ] A turn at least every 15 s, the peak number escalates across familiar things with each
+      number on a label next to its object, and three or more gags including faces on things
+      (L28).
+- [ ] At least two bird close-ups with the head at 40% or more of the frame width (hook and peak)
+      and four or more appearances (L29). Caption chunks of one to four words (L30).
 - [ ] At most one text block besides the captions in every contact-sheet frame (L19).
 - [ ] `out/<id>-cover.png` exists; in `out/grid-preview.png` the title reads at grid size and the
       series looks consistent (L20).

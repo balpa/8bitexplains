@@ -20,7 +20,12 @@ DURATION_RANGE = (45.0, 60.0)
 MIN_SPEECH_OVER_GAP_DB = 6.0
 FIRST_WORD_MAX_S = 0.35
 WPM_RANGE = (160.0, 200.0)
-CTA_PAUSE_S = 0.8
+LIFE_FPS = 1
+LIFE_SIZE = (270, 480)
+MOTION_MIN = 10.0
+LUMA_MIN = 50.0
+SCENE_LUMA_MIN = 30.0
+LOOP_MAX = 35.0
 SHEET_EVERY_S = 2.5
 HOLD_FPS = 2
 HOLD_CROP = (0, 0, 1080, 1180)
@@ -97,12 +102,13 @@ def script_checks(manifest: dict) -> list[tuple[str, bool]]:
     wpm = words / voiced * 60 if voiced else 0.0
     aftermath = len(scenes) >= 2 and scenes[-2].get("beat") == "aftermath"
     outro = scenes[-1]["lines"]
-    pause = (outro[-1]["startFrame"] - outro[-2]["endFrame"]) / fps if len(outro) >= 2 else 0.0
+    last = outro[-1]["text"].rstrip()
     return [
         (f"first word at {first:.2f}s (<= {FIRST_WORD_MAX_S}s)", first <= FIRST_WORD_MAX_S),
         (f"speech rate {wpm:.0f} wpm in {WPM_RANGE}", WPM_RANGE[0] <= wpm <= WPM_RANGE[1]),
-        ("aftermath scene right before the save point", aftermath),
-        (f"pause before the follow line >= {CTA_PAUSE_S}s", pause >= CTA_PAUSE_S),
+        ("aftermath scene right before the outro", aftermath),
+        ("outro is one takeaway line, no follow line", len(outro) == 1 and "follow" not in last.lower()),
+        ("last line ends open, so the first line completes it on replay", not last.endswith((".", "!", "?"))),
     ]
 
 
@@ -116,6 +122,25 @@ def motion_frames(mp4: Path) -> np.ndarray:
     with tempfile.TemporaryDirectory() as tmp:
         tool("ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(mp4), "-r", str(HOLD_FPS), str(Path(tmp) / "f%04d.png"))
         return np.array([np.asarray(Image.open(p).convert("L").crop(HOLD_CROP).resize(HOLD_CELLS, Image.BOX), float) for p in sorted(Path(tmp).glob("f*.png"))])
+
+
+def life_frames(mp4: Path) -> np.ndarray:
+    """Whole grey frames at 1 fps and 270x480, the scale competitor-shorts.md measured on."""
+    with tempfile.TemporaryDirectory() as tmp:
+        tool("ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(mp4), "-r", str(LIFE_FPS), str(Path(tmp) / "f%04d.png"))
+        return np.array([np.asarray(Image.open(p).convert("L").resize(LIFE_SIZE, Image.BOX), float) for p in sorted(Path(tmp).glob("f*.png"))])
+
+
+def life_stats(frames: np.ndarray, scene_starts_s: list[float], fps: float = LIFE_FPS) -> dict:
+    """Mean frame-to-frame change, mean brightness, the darkest scene's brightness and the loop gap (L26, L30)."""
+    t = np.arange(len(frames)) / fps
+    scenes = [frames[(t >= a) & (t < b)].mean() for a, b in zip(scene_starts_s, [*scene_starts_s[1:], np.inf]) if ((t >= a) & (t < b)).any()]
+    return {
+        "motion": float(np.abs(np.diff(frames, axis=0)).mean()) if len(frames) > 1 else 0.0,
+        "luma": float(frames.mean()),
+        "darkest_scene": float(min(scenes)),
+        "loop": float(np.abs(frames[-1] - frames[0]).mean()),
+    }
 
 
 def holds(frames: np.ndarray, fps: float = HOLD_FPS, change: float = HOLD_CHANGE) -> np.ndarray:
@@ -149,8 +174,13 @@ def grid(count: int, cols: int) -> tuple[int, int]:
     return cols, (count + cols - 1) // cols
 
 
+def sheet_times(duration: float) -> np.ndarray:
+    """Sample times for the contact sheet; a seek into the last 0.1 s can land past the final frame."""
+    return np.arange(SHEET_EVERY_S / 2, duration - 0.1, SHEET_EVERY_S)
+
+
 def contact_sheet(mp4: Path, duration: float, out: Path, cols: int = 7, size: tuple[int, int] = (270, 480)) -> None:
-    times = np.arange(SHEET_EVERY_S / 2, duration, SHEET_EVERY_S)
+    times = sheet_times(duration)
     with tempfile.TemporaryDirectory() as tmp:
         frames = []
         for k, t in enumerate(times):
@@ -183,6 +213,8 @@ def main(mp4_path: str, manifest_path: str) -> int:
     stills = long_holds(h, outro_s)
     longest = max((min(d, outro_s - t / HOLD_FPS) for t, d in enumerate(h) if t / HOLD_FPS < outro_s), default=0.0)
     weak = short_lines(manifest)
+    starts = np.cumsum([0, *[s["durationInFrames"] for s in manifest["scenes"][:-1]]]) / manifest["fps"]
+    life = life_stats(life_frames(mp4), list(starts))
 
     checks = [
         ("format 1080x1920 @30 fps, h264 + aac", info["width"] == 1080 and info["height"] == 1920 and round(info["fps"]) == 30 and info["video"] == "h264" and info["audio"] == "aac"),
@@ -191,7 +223,10 @@ def main(mp4_path: str, manifest_path: str) -> int:
         (f"true peak {peak:.1f} dBTP below {TRUE_PEAK_MAX}", peak < TRUE_PEAK_MAX),
         (f"voice >= {MIN_SPEECH_OVER_GAP_DB:.0f} dB over background in every scene", all(r["ok"] for r in balance)),
         *script_checks(manifest),
-        (f"no picture holds over {HOLD_FAIL_S:.0f}s before the save point (longest {longest:.1f}s)", longest <= HOLD_FAIL_S),
+        (f"no picture holds over {HOLD_FAIL_S:.0f}s before the outro (longest {longest:.1f}s)", longest <= HOLD_FAIL_S),
+        (f"motion {life['motion']:.1f} >= {MOTION_MIN:.0f} (mean change per second)", life["motion"] >= MOTION_MIN),
+        (f"brightness {life['luma']:.0f} >= {LUMA_MIN:.0f}, darkest scene {life['darkest_scene']:.0f} >= {SCENE_LUMA_MIN:.0f}", life["luma"] >= LUMA_MIN and life["darkest_scene"] >= SCENE_LUMA_MIN),
+        (f"last frame returns to frame 0 (difference {life['loop']:.0f} <= {LOOP_MAX:.0f})", life["loop"] <= LOOP_MAX),
     ]
     sheet = mp4.with_name(f"{ep}-contact.png")
     contact_sheet(mp4, info["duration"], sheet)

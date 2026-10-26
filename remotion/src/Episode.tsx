@@ -13,12 +13,12 @@ const LEAD_IN_S = 0.5;
 export const fit = (text: string, width: number, sizes = [120, 96, 72, 48]) => sizes.find((s) => text.length * s <= width) ?? 24;
 export const longestWord = (text: string) => text.split(" ").reduce((a, w) => (w.length > a.length ? w : a), "");
 
-// Besides the captions only one text block is on screen: the headline until a stat, reveal or the
-// save screen takes over. One that starts during the lead-in owns the scene from frame 0, so the
-// headline never flashes for a few frames.
+// Besides the captions only one text block is on screen: the headline until a stat or reveal takes
+// over. One that starts during the lead-in owns the scene from frame 0, so the headline never
+// flashes for a few frames.
 const overlayFrom = (scene: Scene, fps: number) => {
   const at = (line: number | undefined) => (line === undefined ? 0 : scene.lines[line]?.startFrame ?? 0);
-  const from = scene.visual.endsWith("outro") ? at(scene.lines.length - 1) : scene.stat ? at(scene.statLine) : scene.reveal ? at(scene.reveal.line) : Infinity;
+  const from = scene.stat ? at(scene.statLine) : scene.reveal ? at(scene.reveal.line) : Infinity;
   return from < LEAD_IN_S * fps ? 0 : from;
 };
 
@@ -97,18 +97,24 @@ const Hud: React.FC<{ level: number; levels: number }> = ({ level, levels }) => 
   </div>
 );
 
-const Headline: React.FC<{ scene: Scene; fps: number; level: number; levels: number }> = ({ scene, fps, level, levels }) => {
+// The outro ends on the hook's headline and HUD so the replay starts on the same frame (L26).
+const LOOP_TAIL_S = 0.8;
+
+const Headline: React.FC<{ scene: Scene; hook: Scene; fps: number; level: number; levels: number }> = ({ scene: own, hook, fps, level, levels }) => {
   const frame = useCurrentFrame();
-  const header = frame < HUD_S * fps;
-  const showMain = frame < overlayFrom(scene, fps);
+  const tailFrom = own.visual.endsWith("outro") ? own.durationInFrames - Math.round(LOOP_TAIL_S * fps) : Infinity;
+  const tail = frame >= tailFrom;
+  const scene = tail ? hook : own;
+  const header = frame < HUD_S * fps || tail;
+  const showMain = tail || (!own.visual.endsWith("outro") && frame < overlayFrom(own, fps));
   if (!header && !showMain) return null;
-  const pop = interpolate(frame, [0, 4, 7], [0.6, 1.08, 1], { extrapolateRight: "clamp" });
+  const pop = tail ? 1 : interpolate(frame, [0, 4, 7], [0.6, 1.08, 1], { extrapolateRight: "clamp" });
   const isLevel = scene.title.startsWith("LEVEL");
   const main = isLevel ? scene.sub : scene.title;
-  const sub = isLevel || scene.visual.endsWith("outro") ? "" : scene.sub;
+  const sub = isLevel ? "" : scene.sub;
   return (
     <>
-      {header && <Hud level={level} levels={levels} />}
+      {header && <Hud level={tail ? 0 : level} levels={levels} />}
       <div style={{ ...column, top: 330, transform: `scale(${pop})` }}>
         {isLevel && <div style={{ fontSize: 24, color: C.cyan, textShadow: OUTLINE(3), marginBottom: 18, visibility: header ? "visible" : "hidden" }}>{scene.title}</div>}
         {showMain && (
@@ -124,7 +130,7 @@ const Headline: React.FC<{ scene: Scene; fps: number; level: number; levels: num
   );
 };
 
-const CHUNK = 5;
+const CHUNK = 4;
 const CHUNK_CHARS = 26;
 
 // Greedy word groups that fit two caption lines at 48 px; returns each group's first word index.
@@ -182,13 +188,6 @@ const Overlay: React.FC<{ scene: Scene; fps: number }> = ({ scene, fps }) => {
   }
   const from = overlayFrom(scene, fps);
   if (frame < from) return null;
-  if (scene.visual.endsWith("outro"))
-    return (
-      <div style={{ ...column, top: 820, textShadow: OUTLINE(4) }}>
-        <div style={{ fontSize: 48 }}>{frame < from + 40 ? "SAVING..." : "GAME SAVED!"}</div>
-        <div style={{ fontSize: 48, color: C.yellow, marginTop: 24 }}>@8BITEXPLAINS</div>
-      </div>
-    );
   if (scene.stat) {
     const [, prefix, num, suffix] = scene.stat.match(/^([^0-9]*)([0-9.,]+)(.*)$/) ?? ["", "", "0", ""];
     const decimals = (num.split(".")[1] ?? "").length;
@@ -221,13 +220,12 @@ const SceneSfx: React.FC<{ scene: Scene }> = ({ scene }) => {
       <Audio src={staticFile(`sfx/${name}.wav`)} volume={volume} />
     </Sequence>
   );
-  // One short SFX per scene (learnings L6): on the scene change before the first word,
-  // or after the last word in the outro; about 19 dB under the voice.
-  const lastWord = scene.lines[scene.lines.length - 1]?.endFrame ?? 40;
+  // One short SFX per scene (learnings L6) on the scene change before the first word, about 19 dB
+  // under the voice; the outro has none so it runs straight into the hook on replay.
   switch (scene.visual) {
     default:
       if (scene.visual.endsWith("hook")) return <>{sfx("zap", 0, 0.25)}</>;
-      if (scene.visual.endsWith("outro")) return <>{sfx("save", lastWord + 2, 0.25)}</>;
+      if (scene.visual.endsWith("outro")) return null;
       return <>{sfx("blip", 0, 0.25)}</>;
   }
 };
@@ -255,7 +253,7 @@ export const Episode: React.FC<{ manifest: Manifest }> = ({ manifest }) => {
       <Audio src={staticFile(`${manifest.id}/music.wav`)} volume={musicVolume(manifest)} />
       {manifest.scenes.map((scene, i) => (
         <Sequence key={i} from={starts[i]} durationInFrames={scene.durationInFrames}>
-          <Headline scene={scene} fps={manifest.fps} level={manifest.scenes.slice(0, i + 1).filter((s) => s.title.startsWith("LEVEL")).length} levels={levels} />
+          <Headline scene={scene} hook={manifest.scenes[0]} fps={manifest.fps} level={manifest.scenes.slice(0, i + 1).filter((s) => s.title.startsWith("LEVEL")).length} levels={levels} />
           <Overlay scene={scene} fps={manifest.fps} />
           <Caption scene={scene} />
           <Audio src={staticFile(scene.audio)} />

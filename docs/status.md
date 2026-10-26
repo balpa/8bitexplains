@@ -31,7 +31,12 @@ Read this first when resuming on another machine. Updated 2026-10-26.
    tiny Lake Nyos"), ep006 GPS, radio and the 1859 aurora you could read by, ep007 the
    flash-to-bang count. Topic and visual review with ten new "you" topics:
    docs/research/topics-and-visuals.md. The other catchiness proposals are still open.
-4. **Audio arc** (Priority 3), then **visual craft** (Priority 4), one at a time, checked against
+4. **Competitor rules** (owner, 2026-10-26): ten top science Shorts watched frame by frame
+   (docs/research/competitor-shorts.md); the owner adopted L26-L30 and chose a loop ending over
+   the follow line. Engine and QA done (4-word captions, loop outro, bird close-up face, motion,
+   brightness and loop checks). ep007 v3, then ep005 and ep006 rebuilt the same way on 2026-10-26;
+   all three pass every QA check (ep006 warns of a 4.0 s still in the 2012 near-miss scene).
+5. **Audio arc** (Priority 3), then **visual craft** (Priority 4), one at a time, checked against
    the data.
 
 ## Setting up a new machine

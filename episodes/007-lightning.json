@@ -1,6 +1,6 @@
 {
   "id": "ep007",
-  "title": "Lightning is hotter than the Sun",
+  "title": "The lightning you see is hotter than the Sun",
   "voice": "am_michael",
   "speed": 1.18,
   "detail": 2,
@@ -10,9 +10,11 @@
     "NOAA National Weather Service, Understanding Lightning: Thunder (public domain) - https://www.weather.gov/safety/lightning-science-thunder",
     "NOAA National Weather Service, Understanding Lightning: Overview (public domain) - https://www.weather.gov/safety/lightning-science-overview",
     "NOAA National Severe Storms Laboratory, Severe Weather 101: Lightning (public domain) - https://www.nssl.noaa.gov/education/svrwx101/lightning/",
-    "NOAA National Severe Storms Laboratory, Lightning FAQ (public domain) - https://www.nssl.noaa.gov/education/svrwx101/lightning/faq/"
+    "NOAA National Severe Storms Laboratory, Lightning FAQ (public domain) - https://www.nssl.noaa.gov/education/svrwx101/lightning/faq/",
+    "USGS Volcano Hazards Program FAQ, How hot is a Hawaiian volcano? (public domain) - https://www.usgs.gov/faqs/how-hot-hawaiian-volcano",
+    "NASA Scientific Visualization Studio, the Sun's surface at about 10,000 degrees Fahrenheit (public domain) - https://svs.gsfc.nasa.gov/4668"
   ],
-  "caption": "How is lightning hotter than the Sun?\nLightning is 5 times hotter than the surface of the Sun ⚡ Where the charge comes from, why thunder booms, and how to tell how far away it struck, in 8-bit.\n\nSources (public domain, NOAA):\n- Lightning: Did you know?\n- Understanding Lightning: Thunder\n- Understanding Lightning: Overview\n- NOAA NSSL, Severe Weather 101: Lightning and Lightning FAQ\n\nNot affiliated with or endorsed by NOAA or the National Weather Service.\n\n#lightning #weather #science #howitworks #8bit",
+  "caption": "Why is the lightning you see hotter than the Sun?\nLightning is 5 times hotter than the surface of the Sun ⚡ Where the charge comes from, why thunder booms, and how to tell how far away it struck, in 8-bit.\n\nSources (public domain, NOAA):\n- Lightning: Did you know?\n- Understanding Lightning: Thunder\n- Understanding Lightning: Overview\n- NOAA NSSL, Severe Weather 101: Lightning and Lightning FAQ\n\nNot affiliated with or endorsed by NOAA or the National Weather Service.\n\n#lightning #weather #science #howitworks #8bit",
   "cover": {
     "title": "HOTTER THAN THE SUN",
     "scene": "bolt-strike",
@@ -23,10 +25,10 @@
       "visual": "bolt-hook",
       "beat": "hook",
       "title": "HOTTER THAN THE SUN",
-      "sub": "EVERY LIGHTNING BOLT",
+      "sub": "THE LIGHTNING YOU SEE",
       "vo": [
-        "Lightning is five times hotter than the surface of the Sun.",
-        "So how does it get that hot, and why the boom?"
+        "The lightning you see is hotter than the Sun.",
+        "So how does a cloud make that, and why the boom?"
       ]
     },
     {
@@ -45,7 +47,7 @@
       "title": "LEVEL 2",
       "sub": "THE SPARK",
       "vo": [
-        "Air is an insulator: it holds the charges apart until the difference gets too big.",
+        "But air is an insulator. It holds the charges apart, until it can't.",
         "Then it fails all at once, in one giant spark."
       ]
     },
@@ -54,13 +56,11 @@
       "beat": "peak",
       "title": "LEVEL 3",
       "sub": "THE HEAT",
-      "stat": "50,000°F",
-      "statLabel": "5X THE SUN'S SURFACE",
       "vo": [
-        "It heats the air in its path to fifty thousand degrees Fahrenheit, in millionths of a second.",
-        "Five times the Sun's surface."
-      ],
-      "statLine": 0
+        "It heats the air in its path in millionths of a second.",
+        "Your kettle boils at two hundred twelve degrees. Lava, about two thousand.",
+        "The Sun's surface, ten thousand. Lightning? Fifty thousand."
+      ]
     },
     {
       "visual": "bolt-balloon",
@@ -80,7 +80,7 @@
       "stat": "10,000",
       "statLabel": "FOREST FIRES A YEAR",
       "vo": [
-        "That heat starts about ten thousand forest fires a year."
+        "And that heat starts ten thousand forest fires a year."
       ]
     },
     {
@@ -100,11 +100,10 @@
     {
       "visual": "bolt-outro",
       "beat": "outro",
-      "title": "SAVE POINT",
-      "sub": "SAVE THIS ONE",
+      "title": "ONE MORE THING",
+      "sub": "",
       "vo": [
-        "Hear thunder? You're in range. Go indoors.",
-        "Follow Eight Bit Explains."
+        "So if you hear thunder, get inside, and remember:"
       ]
     }
   ]

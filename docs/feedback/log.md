@@ -2,6 +2,14 @@
 
 Raw feedback from the owner, newest first, with what was changed in response.
 
+## 2026-10-26 · competitor analysis (docs/research/competitor-shorts.md)
+
+- Asked to watch the most-viewed Shorts in our style frame by frame and improve our videos from
+  them, and to check what is trending. -> competitor-shorts.md, out/scout-2026-10-26.md
+- Chose to drop the follow line and end on a loop back to the first frame and first sentence.
+  -> L26 (replaces L17)
+- "Apply the other proposed rules too." -> L27-L30
+
 ## 2026-10-26 · ep005-ep007 v2 (re-rendered 2026-10-20)
 
 - "These videos were nice overall, but we need to add things so they are catchy." -> L23

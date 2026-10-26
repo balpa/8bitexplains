@@ -1,4 +1,5 @@
-import { Buf, Palette, hex, sprite } from "./pixel";
+import { Buf, Palette, RGB, hex, ramp, sprite } from "./pixel";
+import { pick, shadeAll } from "./fine";
 import { P } from "./palette";
 
 const BIRD_UP = [
@@ -88,6 +89,117 @@ export const drawBirdAs = (buf: Buf, x: number, y: number, frame: number, mood: 
     [3, 4, 5, 6, 7].forEach((i) => block(i, eye, P.ink));
     [4, 6].forEach((i) => block(i, eye + 1, P.ink));
     if (Math.floor(frame / 20) % 3 === 0) block(6, eye, P.white);
+  }
+};
+
+const FACE = [
+  "..kk................kk..",
+  "..kwk..............kwk..",
+  "...kwkkkkkkkkkkkkkkwk...",
+  "...kwwwwwwwwwwwwwwwwk...",
+  "..kwwwwwwwwwwwwwwwwwwk..",
+  ".kwwwwwwwwwwwwwwwwwwwwk.",
+  ".kwwwwwwwwwwwwwwwwwwwwk.",
+  ".kwwwwwwwwwwwwwwwwwwwwk.",
+  ".kwwwwwwwwwwwwwwwwwwwwk.",
+  ".kwwwwwwwwyyyywwwwwwwwk.",
+  ".kwbbwwwwyyyyyywwwwbbwk.",
+  ".kwbbwwwwkyyyykwwwwbbwk.",
+  ".kwwwwwwwwkyykwwwwwwwwk.",
+  "..kwwwwwwwwkkwwwwwwwwk..",
+  "...kwwwwwwwwwwwwwwwwk...",
+  "....kkkkkkkkkkkkkkkk....",
+];
+const FACE_PAL: Palette = { k: P.ink, w: P.white, y: P.yellow, b: P.pink, r: P.red, c: P.cyan };
+
+export type FaceMood = "look" | "shock" | "squint" | "grin" | "sweat";
+
+// Close-up of the mascot's head for reaction shots (L29): 24x16 logical pixels before scaling, so
+// scale 3 fills 40% of the frame width. Eyes, brows and beak change with the mood.
+export const drawBirdFace = (buf: Buf, x: number, y: number, frame: number, mood: FaceMood, scale = 3) => {
+  const rows = FACE.map((r) => r.split(""));
+  const set = (i: number, j: number, ch: string) => { if (rows[j] && rows[j][i] !== undefined) rows[j][i] = ch; };
+  const eye = (x0: number, draw: (i: number, j: number) => string | null) => {
+    for (let j = 5; j <= 8; j++) for (let i = x0; i < x0 + 4; i++) { const ch = draw(i - x0, j - 5); if (ch) set(i, j, ch); }
+  };
+  const blink = mood === "look" && frame % 90 > 84;
+  for (const x0 of [5, 15]) {
+    if (blink || mood === "squint") eye(x0, (i, j) => (j === 2 ? "k" : null));
+    else if (mood === "grin") eye(x0, (i, j) => ((j === 1 && (i === 1 || i === 2)) || (j === 2 && (i === 0 || i === 3)) ? "k" : null));
+    else if (mood === "shock") eye(x0, (i, j) => (i === 0 || i === 3 || j === 0 || j === 3 ? "k" : i === 1 && j === 1 ? "k" : null));
+    else {
+      const look = mood === "sweat" ? 0 : 1;
+      eye(x0, (i, j) => (i === 0 || i === 3 || j === 0 || j === 3 ? "k" : i === 1 + look && j >= 1 && j <= 2 ? "k" : null));
+    }
+  }
+  if (mood === "shock") {
+    for (const x0 of [5, 15]) for (let i = 0; i < 4; i++) set(x0 + i, 3, "k");
+    ["kkkk", "krrk", "krrk"].forEach((r, j) => r.split("").forEach((ch, i) => set(10 + i, 11 + j, ch)));
+  }
+  if (mood === "squint") for (const x0 of [5, 15]) for (let i = 0; i < 4; i++) set(x0 + i, 4, "k");
+  if (mood === "grin") ["krrrrk", ".krrk."].forEach((r, j) => r.split("").forEach((ch, i) => ch !== "." && set(9 + i, 11 + j, ch)));
+  sprite(buf, rows.map((r) => r.join("")), FACE_PAL, Math.round(x), Math.round(y), false, scale);
+  if (mood === "sweat" && Math.floor(frame / 9) % 3 !== 2) {
+    const d = hex(P.cyan), dy = (frame % 18) / 3;
+    buf.rect(x + 21 * scale, y + (3 + dy) * scale * 0.5 + 6, scale, scale * 2, d);
+  }
+};
+
+const DIGITS: Record<string, string[]> = {
+  "0": ["www", "w.w", "w.w", "w.w", "www"],
+  "1": [".w.", "ww.", ".w.", ".w.", "www"],
+  "2": ["www", "..w", "www", "w..", "www"],
+  "3": ["www", "..w", "www", "..w", "www"],
+  "4": ["w.w", "w.w", "www", "..w", "..w"],
+  "5": ["www", "w..", "www", "..w", "www"],
+  "6": ["www", "w..", "www", "w.w", "www"],
+  "7": ["www", "..w", "..w", ".w.", ".w."],
+  "8": ["www", "w.w", "www", "w.w", "www"],
+  "9": ["www", "w.w", "www", "..w", "www"],
+  ",": ["...", "...", "...", ".w.", "w.."],
+  "°": ["ww.", "ww.", "...", "...", "..."],
+  F: ["www", "w..", "ww.", "w..", "w.."],
+  M: ["w.w", "www", "www", "w.w", "w.w"],
+  P: ["ww.", "w.w", "ww.", "w..", "w.."],
+  H: ["w.w", "w.w", "www", "w.w", "w.w"],
+  S: [".ww", "w..", ".w.", "..w", "ww."],
+  E: ["www", "w..", "ww.", "w..", "www"],
+  C: [".ww", "w..", "w..", "w..", ".ww"],
+  " ": ["...", "...", "...", "...", "..."],
+};
+
+// A number label on a dark pill, centred on (cx, cy), for numbers that sit next to their object (L28).
+export const drawNumber = (buf: Buf, text: string, cx: number, cy: number, color: string = P.white, scale = 2) => {
+  const w = text.length * 4 * scale - scale, h = 5 * scale;
+  const x0 = Math.round(cx - w / 2), y0 = Math.round(cy - h / 2);
+  buf.rect(x0 - 2, y0 - 2, w + 4, h + 4, hex(P.ink));
+  [...text].forEach((ch, k) => sprite(buf, DIGITS[ch] ?? ["...", "...", "...", "...", "..."], { w: color }, x0 + k * 4 * scale, y0, false, scale));
+};
+
+// Two eyes on an object (L28 faces on things), in logical pixels around (cx, cy).
+export const drawEyes = (buf: Buf, cx: number, cy: number, mood: "angry" | "scared" | "open", size = 3, gap = 6) => {
+  const ink = hex(P.ink), white = hex(P.white);
+  for (const side of [-1, 1]) {
+    const x = Math.round(cx + side * gap - size / 2), y = Math.round(cy - size / 2);
+    buf.rect(x - 1, y - 1, size + 2, size + 2, ink);
+    buf.rect(x, y, size, size, white);
+    const p = Math.max(1, Math.floor(size / 2));
+    buf.rect(x + (mood === "scared" ? Math.floor((size - p) / 2) : side < 0 ? size - p : 0), y + Math.floor((size - p) / 2), p, p, ink);
+    if (mood === "angry") for (let k = 0; k < size + 2; k++) buf.put(x - 1 + k, y - 2 - Math.round((side > 0 ? k : size + 1 - k) / 3), ink);
+    if (mood === "scared") buf.rect(x, y - 3, size, 1, ink);
+  }
+};
+
+const CLOSE_BG = ramp(["#0f6a8a", "#1f9ec0", "#3ee0ff", "#9af2ff"]);
+
+// Full-frame reaction shot (L29): the bird's head at 40% of the frame width on a bright backdrop,
+// with optional sparks circling it.
+export const drawCloseUp = (buf: Buf, t: number, frame: number, mood: FaceMood, sparks = 0, bg: RGB[] = CLOSE_BG) => {
+  shadeAll(buf, (x, y) => pick(bg, x, y, 0.35 + y / 420 + 0.05 * Math.sin((x + y) / 14 - t * 3)));
+  drawBirdFace(buf, 54, 104 + Math.round(Math.sin(t * 5) * 2), frame, mood, 3);
+  for (let k = 0; k < sparks; k++) {
+    const a = t * 7 + k * 2.1, r = 50 + 6 * Math.sin(t * 11 + k);
+    buf.rect(90 + Math.cos(a) * r, 128 + Math.sin(a) * r * 0.8, 2, 2, hex(P.yellow));
   }
 };
 

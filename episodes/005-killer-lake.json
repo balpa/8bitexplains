@@ -1,6 +1,6 @@
 {
   "id": "ep005",
-  "title": "The lake that killed overnight",
+  "title": "This lake burped out a gas cloud you couldn't see",
   "voice": "am_michael",
   "speed": 1.2,
   "detail": 2,
@@ -10,7 +10,7 @@
     "USGS Open-File Report 97-487, Evans and others (1997), lake overturn and gas release (public domain) - https://pubs.usgs.gov/of/1997/of97-487/data/OFR97-487.pdf",
     "USGS publication 70032981, Lake Nyos degassing (public domain) - https://pubs.usgs.gov/publication/70032981"
   ],
-  "caption": "How can a lake burp out a cloud of gas?\nIn 1986 a quiet lake in Cameroon released a giant cloud of carbon dioxide. No wave, no fire, just gas 🫧 How Lake Nyos became a shaken soda bottle, and why people live there again, in 8-bit.\n\nSources (public domain, NASA and USGS):\n- NASA Earth Observatory, Lake Nyos, Cameroon\n- USGS Open-File Report 97-487\n- USGS, Lake Nyos degassing\n\nNot affiliated with or endorsed by NASA or the USGS.\n\n#science #volcano #geology #howitworks #8bit",
+  "caption": "How did a lake burp out a gas cloud you couldn't see?\nIn 1986 a quiet lake in Cameroon released a giant cloud of carbon dioxide. No wave, no fire, just gas 🫧 How Lake Nyos became a shaken soda bottle, and why people live there again, in 8-bit.\n\nSources (public domain, NASA and USGS):\n- NASA Earth Observatory, Lake Nyos, Cameroon\n- USGS Open-File Report 97-487\n- USGS, Lake Nyos degassing\n\nNot affiliated with or endorsed by NASA or the USGS.\n\n#science #volcano #geology #howitworks #8bit",
   "cover": {
     "title": "BURPING LAKE",
     "scene": "nyos-village",
@@ -21,10 +21,10 @@
       "visual": "nyos-hook",
       "beat": "hook",
       "title": "THE LAKE THAT BURPED",
-      "sub": "CAMEROON, 1986",
+      "sub": "A CLOUD YOU COULDN'T SEE",
       "vo": [
-        "In nineteen eighty-six, a lake in Cameroon burped out a giant cloud of gas.",
-        "No wave. No fire. So how does a lake burp?"
+        "This lake burped out a gas cloud you couldn't see.",
+        "Cameroon, nineteen eighty-six. No wave, no fire. So how does a lake burp?"
       ]
     },
     {
@@ -44,7 +44,7 @@
       "sub": "A SODA CAP",
       "vo": [
         "Down there, the water's weight squeezes the gas in, like a soda cap.",
-        "The deep layer never mixes with the top, so the gas keeps building."
+        "But the deep layer never mixes with the top, so the gas keeps building."
       ]
     },
     {
@@ -62,11 +62,9 @@
       "beat": "peak",
       "title": "LEVEL 4",
       "sub": "THE INVISIBLE FLOOD",
-      "stat": "100 KM/H",
-      "statLabel": "FASTER THAN HIGHWAY TRAFFIC",
       "vo": [
         "Carbon dioxide is heavier than air, so it poured downhill,",
-        "at over sixty miles an hour."
+        "at over sixty miles an hour. You couldn't outrun it."
       ]
     },
     {
@@ -96,11 +94,10 @@
     {
       "visual": "nyos-outro",
       "beat": "outro",
-      "title": "SAVE POINT",
-      "sub": "SAVE THIS ONE",
+      "title": "ONE MORE THING",
+      "sub": "",
       "vo": [
-        "Every fizzing soda is a tiny Lake Nyos.",
-        "Follow Eight Bit Explains."
+        "And every soda you open is a tiny reminder that"
       ]
     }
   ]

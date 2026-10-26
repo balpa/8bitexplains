@@ -39,3 +39,6 @@ text and the floppy disk icon (but not the background behind them).
 | Balloon pop metaphor with pressure rings | `drawBalloon` | ep007 | Retired |
 | Lightning channel close-up next to the Sun | `drawChannel` | ep007 | Retired |
 | Burning forest edge with smoke | `drawPrairie` forest | ep007 | Retired |
+| Bird reaction close-up on a bright cyan backdrop | `drawBirdFace` | ep007 v3 | Brand element: may repeat (L29) |
+| Heat ladder: kettle, lava, Sun and bolt on bars at dusk | `drawLadder` | ep007 v3 | Retired |
+| Faces on things: the sleepy lake, the soda bottle, the scowling Sun, the panicking transformer | `eyesAt`, `drawEyes` | ep005 v3, ep006 v3 | Technique may repeat; never the same object twice |

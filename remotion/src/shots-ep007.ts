@@ -1,8 +1,8 @@
 import { Buf, clamp01, hex, lerp, smoothstep } from "./engine/pixel";
 import { P } from "./engine/palette";
-import { SHOCK, TREE, drawBalloon, drawChannel, drawCloudInside, drawPrairie, drawStrike, strikeBolt } from "./engine/lightning";
+import { SHOCK, TREE, drawBalloon, drawChannel, drawCloudInside, drawLadder, drawPrairie, drawStrike, strikeBolt } from "./engine/lightning";
 import { Camera, toScreen } from "./engine/fine";
-import { drawBird, drawBirdAs, drawFloppy } from "./engine/sprites";
+import { drawBird, drawBirdAs, drawCloseUp, drawNumber } from "./engine/sprites";
 import { Shot, ShotCtx, lineStart, split } from "./shot-kit";
 
 // Lightning: charge, thunder, heat and harm (NOAA National Weather Service).
@@ -22,16 +22,29 @@ const hookBird = (buf: Buf, c: ShotCtx, cam: Camera) => {
 
 const flashAt = (t: number, at: number) => (t < at ? 0 : Math.exp(-(t - at) * 4.5) * (Math.floor(t * 24) % 5 === 0 ? 0.6 : 1));
 
-const hook: Shot = (buf, c) => {
+// Frame 0 and the outro's last frame share this camera so the replay loops (L26).
+const CAM0 = { x: TREE.x - 4, y: 184, zoom: 2 };
+
+const wide: Shot = (buf, c) => {
   const pull = smoothstep(0.6, 2.8, c.t), push = smoothstep(3.2, c.dur, c.t);
-  const cam = { x: lerp(lerp(TREE.x - 6, 92, pull), TREE.x, push), y: lerp(lerp(186, 176, pull), 180, push), zoom: lerp(lerp(1.6, 1.05, pull), 1.5, push) };
+  const cam = { x: lerp(lerp(CAM0.x, 92, pull), TREE.x, push), y: lerp(lerp(CAM0.y, 176, pull), 180, push), zoom: lerp(lerp(CAM0.zoom, 1.05, pull), 1.5, push) };
   drawPrairie(buf, { t: c.t, cam, flash: Math.max(0.15 * smoothstep(0, STRIKE, c.t), flashAt(c.t, STRIKE)), rain: 0.5, treeFire: smoothstep(0.4, 1.4, c.t) * 0.7 });
-  if (c.t < 1.1 && !(c.t > 0.5 && Math.floor(c.t * 20) % 3 === 0)) drawStrike(buf, strikeBolt(4), smoothstep(0, STRIKE, c.t), cam);
+  if (c.t < 1.1 && !(c.t > 0.5 && Math.floor(c.t * 20) % 3 === 0)) drawStrike(buf, strikeBolt(4), lerp(0.45, 1, smoothstep(0, STRIKE, c.t)), cam);
   if (c.t > STRIKE) {
     const p = { x: 90 + (TOP.x - cam.x) * cam.zoom, y: 160 + (TOP.y - cam.y) * cam.zoom };
     SHOCK(buf, p.x, p.y, c.t - STRIKE);
   }
   hookBird(buf, c, cam);
+};
+
+const closeUp = drawCloseUp;
+
+// The hook cuts on caption chunks (L27): strike, the bird's shocked face, the bolt beside the Sun,
+// then back to the smoking tree.
+const hook: Shot = (buf, c) => {
+  if (c.t < 0.8 || c.t >= 2.6) return wide(buf, c);
+  if (c.t < 1.65) return closeUp(buf, c.t, c.frame, "shock", 6);
+  drawChannel(buf, c.t, 1, smoothstep(1.65, 2.0, c.t), { x: 96, y: 196, zoom: 1.2 });
 };
 
 const cloud: Shot = (buf, c) => {
@@ -73,14 +86,20 @@ const strike: Shot = (buf, c) => {
   });
 };
 
+// The heat ladder (L28): the channel heats up, then a kettle, lava, the Sun and the bolt each get a
+// bar and a number, the bolt's bar shoots off the top, and the bird's face reacts.
 const heat: Shot = (buf, c) => {
-  const l1 = lineStart(c, 0, 0.3), l2 = lineStart(c, 1, 6.5);
-  const into = smoothstep(l1, l2 - 0.3, c.t), out = smoothstep(l2 - 0.3, l2 + 0.5, c.t);
-  const cam = { x: lerp(lerp(90, 36, into), 96, out), y: lerp(lerp(160, 140, into), 196, out), zoom: lerp(lerp(1, 2.4, into), 1.2, out) };
-  drawChannel(buf, c.t, lerp(0.35, 1, into), smoothstep(l2 - 0.3, l2 + 0.4, c.t), cam);
-  // Gag: next to the Sun for scale, the bird slides in wearing sunglasses.
-  const k = smoothstep(l2 + 0.1, l2 + 0.8, c.t);
-  if (k > 0) drawBirdAs(buf, lerp(-34, 78, k), 180 + Math.sin(c.t * 3) * 2, c.frame, "shades", false, 3);
+  const l0 = lineStart(c, 0, 0.3), l1 = lineStart(c, 1, 3.5), l2 = lineStart(c, 2, 8.3);
+  if (c.t < l1 - 0.1) {
+    const into = smoothstep(l0, l1 - 0.3, c.t);
+    drawChannel(buf, c.t, lerp(0.35, 1, into), 0, { x: lerp(90, 36, into), y: lerp(160, 140, into), zoom: lerp(1, 2.4, into) });
+    return;
+  }
+  if (c.t > l2 + 2.8) return closeUp(buf, c.t, c.frame, "sweat", 0);
+  const at = [l1 + 0.2, l1 + 2.6, l2 + 0.1, l2 + 1.5];
+  drawLadder(buf, c.t, at.map((a) => smoothstep(a, a + 0.8, c.t)), at.map((a) => a + 0.4), drawNumber);
+  // Gag: the bird in sunglasses next to the Sun's bar.
+  if (c.t > at[2] + 0.4) drawBirdAs(buf, 84, 178 + Math.sin(c.t * 3) * 2, c.frame, c.t > at[3] + 0.3 ? "puffed" : "shades", true, 3);
 };
 
 const fire: Shot = (buf, c) => drawPrairie(buf, { t: c.t, forest: smoothstep(0, 2.2, c.t), flash: flashAt(c.t, 0.1) * 0.6 });
@@ -105,13 +124,20 @@ const people: Shot = (buf, c) => {
   } else drawBirdAs(buf, bird.x + Math.round(Math.sin(c.frame * 2.1) * 2 * (1 - smoothstep(boom, boom + 0.5, c.t))), bird.y, c.frame, "puffed", false, 3);
 };
 
+// Loop (L26): the camera returns to frame 0's framing and the bird lands back on the same tree,
+// still sweating, so the replay strikes it again.
 const outro: Shot = (buf, c) => {
-  const k = smoothstep(0, 2.2, c.t);
-  drawPrairie(buf, { t: c.t, cam: { x: lerp(92, TREE.x - 6, k), y: lerp(176, 186, k), zoom: lerp(1.05, 1.6, k) }, rain: 0.5, door: 1, flash: flashAt(c.t % 2.7, 1.9) * 0.25 });
-  drawFloppy(buf, 70, 96);
-  // Callback to the hook: still a little sooty, the bird flinches at every distant flash.
-  const flinch = (c.t % 2.7) > 1.9 && (c.t % 2.7) < 2.4;
-  drawBirdAs(buf, 112, 178 + Math.sin(c.t * 3) * 3, c.frame, flinch ? "puffed" : "charred", true, 3);
+  const k = smoothstep(0, c.dur - 0.8, c.t);
+  const cam = { x: lerp(92, CAM0.x, k), y: lerp(176, CAM0.y, k), zoom: lerp(1.05, CAM0.zoom, k) };
+  drawPrairie(buf, { t: c.t, cam, rain: 0.5, flash: c.t < c.dur - 1.2 ? flashAt(c.t % 1.4, 0.5) * 0.6 : 0 });
+  const perch = toScreen(cam, TREE.x - 3, TREE.base - TREE.h - 1);
+  const land = smoothstep(0.4, c.dur - 0.5, c.t);
+  const x = lerp(170, perch.x - 16, land), y = lerp(90, perch.y - 20, land) + Math.sin(c.t * 4) * 3 * (1 - land);
+  if (land < 1) drawBird(buf, x, y, c.frame, true, 3, true);
+  else drawBird(buf, x, y, 6, false, 3);
+  // The next strike is already on its way down, as on frame 0.
+  const bolt = smoothstep(c.dur - 0.4, c.dur, c.t) * 0.45;
+  if (bolt > 0) drawStrike(buf, strikeBolt(4), bolt, cam);
 };
 
 export const EP007_SHOTS: Record<string, Shot> = {

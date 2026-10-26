@@ -53,7 +53,7 @@ class QaTest(unittest.TestCase):
             "scenes": [
                 {"beat": "hook", "durationInFrames": 30, "lines": [{"text": " ".join(["w"] * 9), "startFrame": 3, "endFrame": 33}]},
                 {"beat": "aftermath", "durationInFrames": 20, "lines": [{"text": "a b c", "startFrame": 0, "endFrame": 10}]},
-                {"beat": "outro", "durationInFrames": 30, "lines": [{"text": "x", "startFrame": 0, "endFrame": 5}, {"text": "y", "startFrame": 14, "endFrame": 18}]},
+                {"beat": "outro", "durationInFrames": 30, "lines": [{"text": "and that's why", "startFrame": 0, "endFrame": 10}]},
             ],
         }
         self.assertTrue(all(ok for _, ok in qa.script_checks(manifest)))
@@ -68,15 +68,25 @@ class QaTest(unittest.TestCase):
         }
         self.assertEqual([ok for _, ok in qa.script_checks(manifest)][:3], [False, False, False])
 
-    def test_script_checks_want_a_pause_before_the_follow_line(self):
+    def test_script_checks_reject_a_follow_line_and_a_closed_last_line(self):
         manifest = {
             "fps": 10,
             "scenes": [
                 {"beat": "aftermath", "durationInFrames": 30, "lines": [{"text": " ".join(["w"] * 9), "startFrame": 3, "endFrame": 33}]},
-                {"beat": "outro", "durationInFrames": 30, "lines": [{"text": "a b c", "startFrame": 0, "endFrame": 10}, {"text": "x", "startFrame": 12, "endFrame": 15}]},
+                {"beat": "outro", "durationInFrames": 30, "lines": [{"text": "a b c.", "startFrame": 0, "endFrame": 10}, {"text": "Follow Eight Bit Explains.", "startFrame": 12, "endFrame": 25}]},
             ],
         }
-        self.assertEqual(dict(qa.script_checks(manifest))[f"pause before the follow line >= {qa.CTA_PAUSE_S}s"], False)
+        checks = dict(qa.script_checks(manifest))
+        self.assertFalse(checks["outro is one takeaway line, no follow line"])
+        self.assertFalse(checks["last line ends open, so the first line completes it on replay"])
+
+    def test_life_stats_measure_motion_brightness_and_the_darkest_scene(self):
+        frames = np.array([np.full((480, 270), v, float) for v in (100, 120, 100, 40, 20)])
+        stats = qa.life_stats(frames, [0.0, 3.0])
+        self.assertAlmostEqual(stats["motion"], 30.0)
+        self.assertAlmostEqual(stats["luma"], 76.0)
+        self.assertAlmostEqual(stats["darkest_scene"], 30.0)
+        self.assertAlmostEqual(stats["loop"], 80.0)
 
     def test_holds_measure_how_long_a_picture_stays_put(self):
         rng = np.random.default_rng(0)
@@ -109,6 +119,9 @@ class QaTest(unittest.TestCase):
         manifest = {"scenes": [{"lines": [{"text": "That bang is thunder.", "tokens": 17}, {"text": "long enough", "tokens": 40}, {"text": "old manifest"}]}]}
         self.assertEqual(qa.short_lines(manifest), ["That bang is thunder."])
 
+    def test_sheet_times_stop_short_of_the_last_frame(self):
+        self.assertEqual(qa.sheet_times(58.77)[-1], 56.25)
+
     def test_grid_rounds_rows_up(self):
         self.assertEqual(qa.grid(21, 7), (7, 3))
         self.assertEqual(qa.grid(22, 7), (7, 4))
@@ -124,7 +137,7 @@ class QaMainTest(unittest.TestCase):
             "fps": 30,
             "scenes": [
                 {"visual": "a", "beat": "aftermath", "durationInFrames": 1350, "lines": [{"text": " ".join(["w"] * 90), "startFrame": 9, "endFrame": 909}]},
-                {"visual": "b", "beat": "outro", "durationInFrames": 150, "lines": [{"text": "a b c", "startFrame": 0, "endFrame": 30}, {"text": "x y z", "startFrame": 60, "endFrame": 90}]},
+                {"visual": "b", "beat": "outro", "durationInFrames": 150, "lines": [{"text": "a b c and so", "startFrame": 0, "endFrame": 30}]},
             ],
         }
 
@@ -143,7 +156,13 @@ class QaMainTest(unittest.TestCase):
             frames[k] = frames[still_from]
         return np.array(frames)
 
-    def run_main(self, frames):
+    def life(self, loop_end=100.0):
+        rng = np.random.default_rng(3)
+        frames = rng.uniform(60, 140, (int(self.DURATION_S), 480, 270))
+        frames[-1] = frames[0] + (loop_end - 100.0)
+        return frames
+
+    def run_main(self, frames, life=None):
         info = {"width": 1080, "height": 1920, "fps": 30.0, "video": "h264", "audio": "aac", "duration": self.DURATION_S}
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp)
@@ -154,21 +173,38 @@ class QaMainTest(unittest.TestCase):
                 mock.patch.object(qa, "tool"),
                 mock.patch.object(qa.sf, "read", return_value=(self.audio(), self.AUDIO_SR)),
                 mock.patch.object(qa, "motion_frames", return_value=frames),
+                mock.patch.object(qa, "life_frames", return_value=self.life() if life is None else life),
                 mock.patch.object(qa, "contact_sheet"),
                 contextlib.redirect_stdout(io.StringIO()),
             ):
                 code = qa.main(str(out / "ep999.mp4"), str(manifest))
             return code, (out / "ep999-qa.md").read_text().splitlines()
 
-    def test_main_fails_a_still_before_the_save_point(self):
+    def test_main_fails_a_still_before_the_outro(self):
         code, report = self.run_main(self.frames(0, 12))
-        self.assertIn("- [ ] no picture holds over 4s before the save point (longest 5.5s)", report)
+        self.assertIn("- [ ] no picture holds over 4s before the outro (longest 5.5s)", report)
         self.assertEqual(code, 1)
 
-    def test_main_exempts_a_still_after_the_save_point(self):
+    def test_main_exempts_a_still_in_the_outro(self):
         code, report = self.run_main(self.frames(90, 10))
-        self.assertIn("- [x] no picture holds over 4s before the save point (longest 0.0s)", report)
+        self.assertIn("- [x] no picture holds over 4s before the outro (longest 0.0s)", report)
         self.assertEqual(code, 0)
+
+    def test_main_checks_motion_brightness_and_the_loop(self):
+        code, report = self.run_main(self.frames(90, 10))
+        self.assertEqual(code, 0)
+        self.assertTrue(any(l.startswith("- [x] motion ") for l in report))
+        self.assertTrue(any(l.startswith("- [x] brightness ") for l in report))
+        self.assertTrue(any(l.startswith("- [x] last frame returns to frame 0 ") for l in report))
+
+    def test_main_fails_a_dark_still_render_that_does_not_loop(self):
+        dark = np.full((int(self.DURATION_S), 480, 270), 20.0)
+        dark[-1] = 200.0
+        code, report = self.run_main(self.frames(90, 10), dark)
+        self.assertEqual(code, 1)
+        self.assertTrue(any(l.startswith("- [ ] motion ") for l in report))
+        self.assertTrue(any(l.startswith("- [ ] brightness ") for l in report))
+        self.assertTrue(any(l.startswith("- [ ] last frame returns to frame 0 ") for l in report))
 
     def test_main_lists_long_holds_and_short_lines_under_warnings(self):
         self.manifest["scenes"][1]["lines"][0].update(text="Hi.", tokens=3)
@@ -176,6 +212,21 @@ class QaMainTest(unittest.TestCase):
         warnings = report[report.index("Warnings:") + 1:]
         self.assertIn("- picture holds 5.5s from 0.0s", warnings)
         self.assertIn("- short line, Kokoro may read it weakly: 'Hi.'", warnings)
+
+
+class LifeFramesTest(unittest.TestCase):
+    def test_life_frames_are_whole_grey_frames_at_one_fps(self):
+        def ffmpeg(name, *args):
+            for k in range(2):
+                Image.new("L", (1080, 1920), 200).save(args[-1] % (k + 1))
+            return ""
+
+        with mock.patch.object(qa, "tool", side_effect=ffmpeg) as tool:
+            frames = qa.life_frames(Path("ep999.mp4"))
+        self.assertEqual(frames.shape, (2, 480, 270))
+        self.assertEqual(frames.min(), 200)
+        args = tool.call_args.args
+        self.assertEqual(args[args.index("-r") + 1], "1")
 
 
 class MotionFramesTest(unittest.TestCase):

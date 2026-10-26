@@ -52,7 +52,7 @@ export type NyosOpts = {
   erupt?: number;
 };
 
-const mistFront = (cloud: number) => lerp(RIM + 4, 250, cloud);
+export const mistFront = (cloud: number) => lerp(RIM + 4, 250, cloud);
 
 const mistAt = (o: NyosOpts, wx: number, wy: number) => {
   const t = o.t, cloud = o.cloud ?? 0, bulge = o.bulge ?? 0, erupt = o.erupt ?? 0;

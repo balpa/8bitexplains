@@ -3,6 +3,30 @@
 Rules distilled from the owner's feedback. Newest first. Each rule says where it came from.
 These override docs/style/style-guide.md when they disagree.
 
+## 2026-10-26 (competitor analysis)
+
+The owner adopted the rules from docs/research/competitor-shorts.md: ten top science Shorts watched
+frame by frame and measured against ep005-ep007.
+
+- **L26 End on a loop, not a call to action.** None of the strong Shorts asks viewers to follow.
+  The outro is one takeaway line that ends on an open connective ("...and that's why", "because")
+  which the hook's first line completes on replay, and the last frame returns to the frame-0
+  composition (same subject, place and scale) with no floppy, "GAME SAVED" or follow text. QA
+  compares the last frame with frame 0. This replaces L17 and the save-point line of L15.
+- **L27 The hook works on mute and in the second person.** Frame 0 shows the subject in its
+  "problem" state, centred and at least half the frame wide, already moving (the 0.25 s frame
+  differs). The first spoken line is the title, addresses "you", and ends by 3 s. The picture
+  changes three to four times in the first 3 s, one change per caption chunk.
+- **L28 Turns and escalation.** A turn ("But...", "And not only...", "Option 2") at least every
+  15 s; the first may set up a wrong human-scale guess that the video corrects. The peak number
+  grows across familiar landmarks or becomes money or an everyday unit, and every number sits in a
+  small label next to its object. At least three throwaway gags, including objects with faces.
+- **L29 The bird acts in close-up.** At least two reaction close-ups where the bird's head fills
+  at least 40% of the frame width (hook and peak) and at least four appearances in total.
+- **L30 Short captions and measured life.** Caption chunks hold one to four words. QA fails a
+  render whose mean frame-to-frame difference at 1 fps is under 10, or whose mean brightness is
+  under 50 (no scene under 30).
+
 ## 2026-10-26 (ep005-ep007 v2 review)
 
 - **L23 Keep the v2 build, add catchiness on top.** The owner found ep005-ep007 nice overall, so
@@ -62,7 +86,7 @@ Research-backed guards the owner approved with the plan (docs/research/improveme
   answer beat restates the whole chain. Say "nobody knows exactly" once where that is true. Every
   fact added for depth cites a public-domain US government page in `sources`. Budget 140-155
   words. That runs 55-60 s, which replaces the 45-55 s aim in L15; 60 s stays the hard limit.
-- **L17 Breathe before the follow line.** The outro has two lines: the takeaway, then a separate
+- **L17 Breathe before the follow line.** (Replaced by L26 on 2026-10-26.) The outro has two lines: the takeaway, then a separate
   "Follow Eight Bit Explains." `tts.py` holds 1.0 s of silence between them (`OUTRO_PAUSE_S`), and
   QA fails if that pause is under 0.8 s.
 
