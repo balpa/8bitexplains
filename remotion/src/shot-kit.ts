@@ -19,3 +19,7 @@ export const split = (c: ShotCtx, at: number, a: Shot, b: Shot, width = 0.4): Bu
   if (k > 0) b(B, c);
   return k <= 0 ? A : k >= 1 ? B : dissolve(A, B, k);
 };
+
+// Camera push (L18 holds): scales positions about (fx, fy) and sizes by z.
+export const push = (z: number, fx: number, fy: number) => ({ x: (v: number) => fx + (v - fx) * z, y: (v: number) => fy + (v - fy) * z, s: (v: number) => v * z });
+export type Push = ReturnType<typeof push>;

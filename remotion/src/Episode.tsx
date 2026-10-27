@@ -100,11 +100,22 @@ const Hud: React.FC<{ level: number; levels: number }> = ({ level, levels }) => 
 // The outro ends on the hook's headline and HUD so the replay starts on the same frame (L26).
 const LOOP_TAIL_S = 0.8;
 
-const Headline: React.FC<{ scene: Scene; hook: Scene; fps: number; level: number; levels: number }> = ({ scene: own, hook, fps, level, levels }) => {
+// v4 (K4): no HUD, LEVEL or sub line; the hook title shows until the second hook line and again in
+// the loop tail, and no other scene has a headline.
+const Headline: React.FC<{ scene: Scene; hook: Scene; fps: number; level: number; levels: number; v4: boolean }> = ({ scene: own, hook, fps, level, levels, v4 }) => {
   const frame = useCurrentFrame();
   const tailFrom = own.visual.endsWith("outro") ? own.durationInFrames - Math.round(LOOP_TAIL_S * fps) : Infinity;
   const tail = frame >= tailFrom;
   const scene = tail ? hook : own;
+  if (v4) {
+    const isHook = own.visual.endsWith("hook");
+    if (!tail && !(isHook && frame < (own.lines[1]?.startFrame ?? own.durationInFrames))) return null;
+    return (
+      <div style={{ ...column, top: 330 }}>
+        <div style={{ fontSize: 72, lineHeight: 1.3, color: C.yellow, textShadow: OUTLINE(6) }}>{hook.title}</div>
+      </div>
+    );
+  }
   const header = frame < HUD_S * fps || tail;
   const showMain = tail || (!own.visual.endsWith("outro") && frame < overlayFrom(own, fps));
   if (!header && !showMain) return null;
@@ -132,9 +143,14 @@ const Headline: React.FC<{ scene: Scene; hook: Scene; fps: number; level: number
 
 const CHUNK = 4;
 const CHUNK_CHARS = 26;
+// v4 (K4): one caption line of at most three words.
+const CHUNK_V4 = 3;
+const CHUNK_CHARS_V4 = 17;
+// One line sits lower than the two-line band, so the subject above it stays clear (inside SAFE.bottom).
+const CAPTION_TOP_V4 = 1296;
 
-// Greedy word groups that fit two caption lines at 48 px; returns each group's first word index.
-const chunkStarts = (words: string[]) =>
+// Greedy word groups that fit two caption lines at 48 px (one line in v4); returns each group's first word index.
+const chunkStarts = (words: string[], CHUNK: number, CHUNK_CHARS: number) =>
   words.reduce<{ starts: number[]; len: number }>(
     (acc, w, i) => {
       const from = acc.starts[acc.starts.length - 1];
@@ -144,18 +160,18 @@ const chunkStarts = (words: string[]) =>
     { starts: [0], len: 0 },
   ).starts;
 
-const Caption: React.FC<{ scene: Scene }> = ({ scene }) => {
+const Caption: React.FC<{ scene: Scene; v4: boolean }> = ({ scene, v4 }) => {
   const frame = useCurrentFrame();
   const line = [...scene.lines].reverse().find((l) => frame >= l.startFrame);
   if (!line || frame > line.endFrame + 8) return null;
   const words = line.text.split(" ");
   const p = Math.min(0.999, Math.max(0, (frame - line.startFrame) / Math.max(1, line.endFrame - line.startFrame)));
   const current = Math.floor(p * words.length);
-  const starts = chunkStarts(words);
+  const starts = v4 ? chunkStarts(words, CHUNK_V4, CHUNK_CHARS_V4) : chunkStarts(words, CHUNK, CHUNK_CHARS);
   const k = starts.filter((st) => st <= current).length - 1;
   const from = starts[k], to = starts[k + 1] ?? words.length;
   return (
-    <div style={{ ...column, top: 1230, fontSize: 48, lineHeight: 1.5, textShadow: OUTLINE(4) }}>
+    <div style={{ ...column, top: v4 ? CAPTION_TOP_V4 : 1230, fontSize: 48, lineHeight: 1.5, textShadow: OUTLINE(4) }}>
       {words.slice(from, to).map((w, i) => (
         <span key={i}>
           <span style={from + i === current ? { color: C.ink, background: C.yellow, textShadow: "none", padding: "0 8px" } : undefined}>{w}</span>{" "}
@@ -169,7 +185,7 @@ const Label: React.FC<{ side: "left" | "right"; top: number; children: React.Rea
   <div style={{ position: "absolute", top, [side]: SAFE.left, fontFamily: PIXEL_FONT, fontSize: 24, color: C.white, textShadow: OUTLINE(3) }}>{children}</div>
 );
 
-const Overlay: React.FC<{ scene: Scene; fps: number }> = ({ scene, fps }) => {
+const Overlay: React.FC<{ scene: Scene; fps: number; v4: boolean }> = ({ scene, fps, v4 }) => {
   const frame = useCurrentFrame();
   switch (scene.visual) {
     case "normal":
@@ -188,7 +204,8 @@ const Overlay: React.FC<{ scene: Scene; fps: number }> = ({ scene, fps }) => {
   }
   const from = overlayFrom(scene, fps);
   if (frame < from) return null;
-  if (scene.stat) {
+  // v4 (K4): the shot draws the number as a pill on its object.
+  if (scene.stat && !v4) {
     const [, prefix, num, suffix] = scene.stat.match(/^([^0-9]*)([0-9.,]+)(.*)$/) ?? ["", "", "0", ""];
     const decimals = (num.split(".")[1] ?? "").length;
     const v = interpolate(frame - from, [10, 60], [0, parseFloat(num.replace(/,/g, ""))], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
@@ -247,15 +264,16 @@ const musicVolume = (m: Manifest) => {
 export const Episode: React.FC<{ manifest: Manifest }> = ({ manifest }) => {
   const starts = sceneStarts(manifest);
   const levels = manifest.scenes.filter((s) => s.title.startsWith("LEVEL")).length;
+  const v4 = manifest.look === "v4";
   return (
     <AbsoluteFill style={{ background: C.ink, width: WIDTH }}>
       <PixelStage manifest={manifest} />
       <Audio src={staticFile(`${manifest.id}/music.wav`)} volume={musicVolume(manifest)} />
       {manifest.scenes.map((scene, i) => (
         <Sequence key={i} from={starts[i]} durationInFrames={scene.durationInFrames}>
-          <Headline scene={scene} hook={manifest.scenes[0]} fps={manifest.fps} level={manifest.scenes.slice(0, i + 1).filter((s) => s.title.startsWith("LEVEL")).length} levels={levels} />
-          <Overlay scene={scene} fps={manifest.fps} />
-          <Caption scene={scene} />
+          <Headline scene={scene} hook={manifest.scenes[0]} fps={manifest.fps} level={manifest.scenes.slice(0, i + 1).filter((s) => s.title.startsWith("LEVEL")).length} levels={levels} v4={v4} />
+          <Overlay scene={scene} fps={manifest.fps} v4={v4} />
+          <Caption scene={scene} v4={v4} />
           <Audio src={staticFile(scene.audio)} />
           <SceneSfx scene={scene} />
         </Sequence>

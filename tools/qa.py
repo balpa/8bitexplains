@@ -26,6 +26,13 @@ MOTION_MIN = 10.0
 LUMA_MIN = 50.0
 SCENE_LUMA_MIN = 30.0
 LOOP_MAX = 35.0
+# The v4 look (docs/research/kurzgesagt-quality.md, K1-K3): targets near Kurzgesagt's Shorts means.
+V4_LUMA_MIN = 85.0
+V4_SATURATION_MIN = 175.0
+# L31: a flat ground has about 6 colour areas, layered scenery about 10, Kurzgesagt's Shorts 9-16.
+V4_AREAS_MIN = 9.0
+AREA_STEP = 32
+AREA_SHARE = 0.01
 SHEET_EVERY_S = 2.5
 HOLD_FPS = 2
 HOLD_CROP = (0, 0, 1080, 1180)
@@ -131,6 +138,28 @@ def life_frames(mp4: Path) -> np.ndarray:
         return np.array([np.asarray(Image.open(p).convert("L").resize(LIFE_SIZE, Image.BOX), float) for p in sorted(Path(tmp).glob("f*.png"))])
 
 
+def color_frames(mp4: Path) -> np.ndarray:
+    """Whole RGB frames at 1 fps and 270x480 for the v4 look checks."""
+    with tempfile.TemporaryDirectory() as tmp:
+        tool("ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(mp4), "-r", str(LIFE_FPS), str(Path(tmp) / "f%04d.png"))
+        return np.array([np.asarray(Image.open(p).convert("RGB").resize(LIFE_SIZE, Image.BOX)) for p in sorted(Path(tmp).glob("f*.png"))])
+
+
+def color_areas(frame: np.ndarray) -> int:
+    """Colours (in AREA_STEP bins) that each cover at least AREA_SHARE of the frame: low for a flat ground (L31)."""
+    _, counts = np.unique((frame // AREA_STEP).reshape(-1, 3), axis=0, return_counts=True)
+    return int((counts >= AREA_SHARE * counts.sum()).sum())
+
+
+def look_stats(frames: np.ndarray) -> dict:
+    """Mean HSV saturation (K2) and mean colour areas (L31)."""
+    sat = [np.asarray(Image.fromarray(f).convert("HSV"))[..., 1].mean() for f in frames]
+    return {
+        "saturation": float(np.mean(sat)),
+        "areas": float(np.mean([color_areas(f) for f in frames])),
+    }
+
+
 def life_stats(frames: np.ndarray, scene_starts_s: list[float], fps: float = LIFE_FPS) -> dict:
     """Mean frame-to-frame change, mean brightness, the darkest scene's brightness and the loop gap (L26, L30)."""
     t = np.arange(len(frames)) / fps
@@ -215,6 +244,8 @@ def main(mp4_path: str, manifest_path: str) -> int:
     weak = short_lines(manifest)
     starts = np.cumsum([0, *[s["durationInFrames"] for s in manifest["scenes"][:-1]]]) / manifest["fps"]
     life = life_stats(life_frames(mp4), list(starts))
+    v4 = manifest.get("look") == "v4"
+    luma_min = V4_LUMA_MIN if v4 else LUMA_MIN
 
     checks = [
         ("format 1080x1920 @30 fps, h264 + aac", info["width"] == 1080 and info["height"] == 1920 and round(info["fps"]) == 30 and info["video"] == "h264" and info["audio"] == "aac"),
@@ -225,9 +256,16 @@ def main(mp4_path: str, manifest_path: str) -> int:
         *script_checks(manifest),
         (f"no picture holds over {HOLD_FAIL_S:.0f}s before the outro (longest {longest:.1f}s)", longest <= HOLD_FAIL_S),
         (f"motion {life['motion']:.1f} >= {MOTION_MIN:.0f} (mean change per second)", life["motion"] >= MOTION_MIN),
-        (f"brightness {life['luma']:.0f} >= {LUMA_MIN:.0f}, darkest scene {life['darkest_scene']:.0f} >= {SCENE_LUMA_MIN:.0f}", life["luma"] >= LUMA_MIN and life["darkest_scene"] >= SCENE_LUMA_MIN),
+        (f"brightness {life['luma']:.0f} >= {luma_min:.0f}, darkest scene {life['darkest_scene']:.0f} >= {SCENE_LUMA_MIN:.0f}", life["luma"] >= luma_min and life["darkest_scene"] >= SCENE_LUMA_MIN),
         (f"last frame returns to frame 0 (difference {life['loop']:.0f} <= {LOOP_MAX:.0f})", life["loop"] <= LOOP_MAX),
     ]
+    if v4:
+        look = look_stats(color_frames(mp4))
+        checks += [
+            (f"v4 look: saturation {look['saturation']:.0f} >= {V4_SATURATION_MIN:.0f}", look["saturation"] >= V4_SATURATION_MIN),
+
+            (f"v4 look: colour areas {look['areas']:.1f} >= {V4_AREAS_MIN:.0f} (no flat grounds, L31)", look["areas"] >= V4_AREAS_MIN),
+        ]
     sheet = mp4.with_name(f"{ep}-contact.png")
     contact_sheet(mp4, info["duration"], sheet)
 

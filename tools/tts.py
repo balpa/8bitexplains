@@ -25,6 +25,9 @@ def gaps_after(scene: dict) -> list[float]:
     return gaps
 
 
+LOOKS = ("v4",)
+
+
 def check_cover(cover: dict, scenes: list[dict]) -> None:
     """The cover frame must fall inside the named scene; Cover.tsx would otherwise throw at render time."""
     scene = next((s for s in scenes if s["visual"] == cover["scene"]), None)
@@ -84,6 +87,10 @@ def main(episode_path: str) -> None:
         print(f"scene {i}: {len(audio) / sr:.2f}s")
 
     manifest = {"id": ep_id, "title": episode["title"], "fps": FPS, "detail": episode.get("detail", 1), "scenes": scenes}
+    if "look" in episode:
+        if episode["look"] not in LOOKS:
+            raise ValueError(f"unknown look {episode['look']!r}; Episode.tsx knows {LOOKS}")
+        manifest["look"] = episode["look"]
     if "cover" in episode:
         check_cover(episode["cover"], scenes)
         manifest["cover"] = episode["cover"]

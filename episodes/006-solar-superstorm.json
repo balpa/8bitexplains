@@ -4,6 +4,7 @@
   "voice": "am_michael",
   "speed": 1.2,
   "detail": 2,
+  "look": "v4",
   "trend": "Evergreen surprising fact (L12): the 1859 Carrington storm and modern grid risk",
   "sources": [
     "NOAA NESDIS, When Solar Storms Attack: Space Weather and Our Infrastructure (public domain) - https://www.nesdis.noaa.gov/news/when-solar-storms-attack-space-weather-and-our-infrastructure",

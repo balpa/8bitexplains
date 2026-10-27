@@ -17,4 +17,5 @@ export type Scene = {
 
 export type Cover = { title: string; scene: string; t: number };
 
-export type Manifest = { id: string; title: string; fps: number; detail?: number; cover?: Cover; scenes: Scene[] };
+// "v4" is the Kurzgesagt-grammar look (docs/research/kurzgesagt-quality.md): far less text on screen.
+export type Manifest = { id: string; title: string; fps: number; detail?: number; look?: "v4"; cover?: Cover; scenes: Scene[] };

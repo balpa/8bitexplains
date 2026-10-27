@@ -4,6 +4,7 @@
   "voice": "am_michael",
   "speed": 1.2,
   "detail": 2,
+  "look": "v4",
   "trend": "Evergreen surprising fact (L12): Lake Nyos, Cameroon, 21 August 1986",
   "sources": [
     "NASA Earth Observatory, Lake Nyos, Cameroon (public domain) - https://science.nasa.gov/earth/earth-observatory/lake-nyos-cameroon-86244",

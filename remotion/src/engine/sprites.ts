@@ -165,6 +165,31 @@ const DIGITS: Record<string, string[]> = {
   S: [".ww", "w..", ".w.", "..w", "ww."],
   E: ["www", "w..", "ww.", "w..", "www"],
   C: [".ww", "w..", "w..", "w..", ".ww"],
+  A: [".w.", "w.w", "www", "w.w", "w.w"],
+  B: ["ww.", "w.w", "ww.", "w.w", "ww."],
+  D: ["ww.", "w.w", "w.w", "w.w", "ww."],
+  G: [".ww", "w..", "w.w", "w.w", ".ww"],
+  I: ["www", ".w.", ".w.", ".w.", "www"],
+  J: ["..w", "..w", "..w", "w.w", ".w."],
+  K: ["w.w", "w.w", "ww.", "w.w", "w.w"],
+  L: ["w..", "w..", "w..", "w..", "www"],
+  N: ["ww.", "w.w", "w.w", "w.w", "w.w"],
+  O: [".w.", "w.w", "w.w", "w.w", ".w."],
+  Q: [".w.", "w.w", "w.w", "ww.", ".ww"],
+  R: ["ww.", "w.w", "ww.", "w.w", "w.w"],
+  T: ["www", ".w.", ".w.", ".w.", ".w."],
+  U: ["w.w", "w.w", "w.w", "w.w", "www"],
+  V: ["w.w", "w.w", "w.w", "w.w", ".w."],
+  W: ["w.w", "w.w", "www", "www", "w.w"],
+  X: ["w.w", "w.w", ".w.", "w.w", "w.w"],
+  Y: ["w.w", "w.w", ".w.", ".w.", ".w."],
+  Z: ["www", "..w", ".w.", "w..", "www"],
+  "+": ["...", ".w.", "www", ".w.", "..."],
+  "-": ["...", "...", "www", "...", "..."],
+  "=": ["...", "www", "...", "www", "..."],
+  "?": ["ww.", "..w", ".w.", "...", ".w."],
+  "!": [".w.", ".w.", ".w.", "...", ".w."],
+  ".": ["...", "...", "...", "...", ".w."],
   " ": ["...", "...", "...", "...", "..."],
 };
 
@@ -174,6 +199,18 @@ export const drawNumber = (buf: Buf, text: string, cx: number, cy: number, color
   const x0 = Math.round(cx - w / 2), y0 = Math.round(cy - h / 2);
   buf.rect(x0 - 2, y0 - 2, w + 4, h + 4, hex(P.ink));
   [...text].forEach((ch, k) => sprite(buf, DIGITS[ch] ?? ["...", "...", "...", "...", "..."], { w: color }, x0 + k * 4 * scale, y0, false, scale));
+};
+
+// A label on a rounded pill in the pill's colour (v4 look, K4), centred on (cx, cy).
+export const drawPill = (buf: Buf, text: string, cx: number, cy: number, bg: string = P.yellow, fg: string = P.ink, scale = 2) => {
+  const w = text.length * 4 * scale - scale, h = 5 * scale, pad = scale + 1;
+  const x0 = Math.round(cx - w / 2), y0 = Math.round(cy - h / 2);
+  const ink = hex(P.ink), fill = hex(bg);
+  buf.rect(x0 - pad, y0 - pad - 1, w + pad * 2, h + pad * 2 + 2, ink);
+  buf.rect(x0 - pad - 1, y0 - pad, w + pad * 2 + 2, h + pad * 2, ink);
+  buf.rect(x0 - pad + 1, y0 - pad, w + pad * 2 - 2, h + pad * 2, fill);
+  buf.rect(x0 - pad, y0 - pad + 1, w + pad * 2, h + pad * 2 - 2, fill);
+  [...text].forEach((ch, k) => sprite(buf, DIGITS[ch] ?? DIGITS[" "], { w: fg }, x0 + k * 4 * scale, y0, false, scale));
 };
 
 // Two eyes on an object (L28 faces on things), in logical pixels around (cx, cy).

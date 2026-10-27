@@ -1,6 +1,6 @@
 # Status and next steps
 
-Read this first when resuming on another machine. Updated 2026-10-26.
+Read this first when resuming on another machine. Updated 2026-10-27.
 
 ## Where we are
 
@@ -36,7 +36,20 @@ Read this first when resuming on another machine. Updated 2026-10-26.
    the follow line. Engine and QA done (4-word captions, loop outro, bird close-up face, motion,
    brightness and loop checks). ep007 v3, then ep005 and ep006 rebuilt the same way on 2026-10-26;
    all three pass every QA check (ep006 warns of a 4.0 s still in the 2012 near-miss scene).
-5. **Audio arc** (Priority 3), then **visual craft** (Priority 4), one at a time, checked against
+5. **Kurzgesagt quality** (owner, 2026-10-27: "good, but not Kurzgesagt quality"). Report:
+   docs/research/kurzgesagt-quality.md. Measured gap is the look, not the pacing: ours are darker
+   (luma 59 vs 95), duller, noisier, with smaller subjects and 4x the text. Proposals K1-K13 wait
+   for the owner's choice. The owner picked mascot "Pip" (out/bird-options.png) and an ep007 pilot
+   with K1-K5: opt-in `"look": "v4"` (text layout in Episode.tsx, flat props in engine/flat.ts,
+   hero.ts, props.ts, v4 QA checks). ep007 v4 rendered 2026-10-27; v3 kept as out/ep007-v3.mp4,
+   side by side in out/ep007-v3-vs-v4.mp4. Owner liked the flow but not the flat backgrounds (L31,
+   L32); from three options they picked "C" (layered scenery plus light) and it is now the v4
+   backdrop in engine/props.ts. Re-rendered 2026-10-27: every QA check passes (edge-density and
+   subject-share checks dropped: they mismeasure layered scenery; colour-area check added).
+   The owner approved it (L33) and asked for ep005 and ep006 in the same look: both rebuilt in v4
+   with Pip and backdrop C on 2026-10-27 (new `space()` backdrop and `drawEarth` in props.ts);
+   v3 kept as out/ep005-v3.mp4 and out/ep006-v3.mp4, side by side in out/ep00N-v3-vs-v4.mp4.
+6. **Audio arc** (Priority 3), then **visual craft** (Priority 4), one at a time, checked against
    the data.
 
 ## Setting up a new machine

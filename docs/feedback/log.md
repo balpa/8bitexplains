@@ -2,6 +2,30 @@
 
 Raw feedback from the owner, newest first, with what was changed in response.
 
+## 2026-10-27 · ep007 v4 with backdrop C
+
+- "This looks good. Move ep005 and ep006 to the v4 look (Pip + C backgrounds) too, and send them
+  side by side." -> L33
+
+## 2026-10-27 · ep007 v4 pilot (Pip, K1-K5)
+
+- "I didn't like how flat the backgrounds in v4 are: too much plain colour. It looks too
+  simplified." -> L31 (strengthens the style guide's three-depth-layers rule, which the pilot
+  dropped; K3's edge-density target is withdrawn)
+- "The storytelling flow and so on felt good, but what I said needs solving." -> L32
+
+## 2026-10-27 · ep005-ep007 v3
+
+- "The videos are quite good, I like them, but I don't think they are at Kurzgesagt quality. We
+  need to bring them to that level." Asked for every piece of research and analysis there is,
+  and a report. -> docs/research/kurzgesagt-quality.md
+- "I don't know if their look is copyrighted; if not, we can use the Kurzgesagt design language
+  in 8-bit. Ours fits the 8-bit theme, but we also need to catch what is current, otherwise we
+  may not catch people." -> kurzgesagt-quality.md §3-§4
+- "We will start posting on Instagram soon and must be ready for everything." ->
+  kurzgesagt-quality.md §7
+- Proposals K1-K13 wait for the owner's choice before they become rules.
+
 ## 2026-10-26 · competitor analysis (docs/research/competitor-shorts.md)
 
 - Asked to watch the most-viewed Shorts in our style frame by frame and improve our videos from

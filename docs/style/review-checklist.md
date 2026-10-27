@@ -23,6 +23,9 @@ review again. Add a line here whenever a logged critique slips through.
 - [ ] Every frame of the contact sheet is full-bleed; no empty band at the top or bottom.
 - [ ] Composition is centred; the main subject sits on the vertical centre line or on a third.
 - [ ] Each shot has at least three depth layers and visible lighting.
+- [ ] No shot sits on a plain colour field: far, mid and near layers behind the subject (L31).
+- [ ] v4: one big subject per shot, at least 30% of the frame (K1); QA cannot measure this once
+      the backdrop is layered.
 - [ ] Consecutive contact-sheet frames look different (something changes every 2-3 s).
 - [ ] Captions: no box, readable on a phone, current word highlighted.
 - [ ] Nothing looks like a slide, a label diagram or a UI panel.

@@ -162,7 +162,18 @@ class QaMainTest(unittest.TestCase):
         frames[-1] = frames[0] + (loop_end - 100.0)
         return frames
 
-    def run_main(self, frames, life=None):
+    def look(self, sat=200, subject=True):
+        frames = np.zeros((int(self.DURATION_S), 480, 270, 3), dtype=np.uint8)
+        frames[..., 0], frames[..., 1], frames[..., 2] = 20, 200, 230
+        for k, colour in enumerate([(40, 120, 220), (30, 160, 90), (20, 90, 60), (200, 230, 250), (100, 60, 200), (250, 220, 40), (240, 100, 120), (60, 40, 100)]):
+            frames[:, 380 + k * 12:392 + k * 12] = colour
+        if subject:
+            frames[:, 120:360, 50:220] = (255, 140, 40)
+        if sat < 100:
+            frames[:] = 128
+        return frames
+
+    def run_main(self, frames, life=None, look=None):
         info = {"width": 1080, "height": 1920, "fps": 30.0, "video": "h264", "audio": "aac", "duration": self.DURATION_S}
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp)
@@ -174,6 +185,7 @@ class QaMainTest(unittest.TestCase):
                 mock.patch.object(qa.sf, "read", return_value=(self.audio(), self.AUDIO_SR)),
                 mock.patch.object(qa, "motion_frames", return_value=frames),
                 mock.patch.object(qa, "life_frames", return_value=self.life() if life is None else life),
+                mock.patch.object(qa, "color_frames", return_value=self.look() if look is None else look),
                 mock.patch.object(qa, "contact_sheet"),
                 contextlib.redirect_stdout(io.StringIO()),
             ):
@@ -206,12 +218,50 @@ class QaMainTest(unittest.TestCase):
         self.assertTrue(any(l.startswith("- [ ] brightness ") for l in report))
         self.assertTrue(any(l.startswith("- [ ] last frame returns to frame 0 ") for l in report))
 
+    def test_main_checks_the_v4_look_only_for_v4_episodes(self):
+        _, report = self.run_main(self.frames(90, 10))
+        self.assertFalse(any("v4 look" in l for l in report))
+        self.manifest["look"] = "v4"
+        code, report = self.run_main(self.frames(90, 10), self.life() + 40)
+        self.assertEqual(code, 0)
+        self.assertTrue(any(l.startswith("- [x] v4 look: saturation ") for l in report))
+        self.assertTrue(any(l.startswith("- [x] v4 look: colour areas ") for l in report))
+        self.assertTrue(any(l.startswith("- [x] brightness ") and ">= 85" in l for l in report))
+
+    def test_main_fails_a_grey_v4_episode_without_a_subject(self):
+        self.manifest["look"] = "v4"
+        code, report = self.run_main(self.frames(90, 10), self.life() - 40, self.look(sat=0, subject=False))
+        self.assertEqual(code, 1)
+        self.assertTrue(any(l.startswith("- [ ] v4 look: saturation ") for l in report))
+        self.assertTrue(any(l.startswith("- [ ] v4 look: colour areas ") for l in report))
+        self.assertTrue(any(l.startswith("- [ ] brightness ") and ">= 85" in l for l in report))
+
     def test_main_lists_long_holds_and_short_lines_under_warnings(self):
         self.manifest["scenes"][1]["lines"][0].update(text="Hi.", tokens=3)
         _, report = self.run_main(self.frames(0, 12))
         warnings = report[report.index("Warnings:") + 1:]
         self.assertIn("- picture holds 5.5s from 0.0s", warnings)
         self.assertIn("- short line, Kokoro may read it weakly: 'Hi.'", warnings)
+
+
+class LookStatsTest(unittest.TestCase):
+    def test_look_stats_measure_saturation(self):
+        frame = np.zeros((480, 270, 3), dtype=np.uint8)
+        frame[:] = (20, 200, 230)
+        frame[120:360, 50:220] = (255, 140, 40)
+        stats = qa.look_stats(np.array([frame, frame]))
+        self.assertGreater(stats["saturation"], 200)
+
+    def test_look_stats_count_colour_areas_so_a_flat_ground_scores_low(self):
+        flat = np.zeros((480, 270, 3), dtype=np.uint8)
+        flat[:] = (20, 200, 230)
+        flat[120:360, 50:220] = (255, 140, 40)
+        layered = flat.copy()
+        for k, colour in enumerate([(40, 120, 220), (30, 160, 90), (20, 90, 60), (200, 230, 250), (100, 60, 200), (250, 220, 40)]):
+            layered[360 + k * 20:380 + k * 20] = colour
+        layered[0:4] = (255, 255, 255)
+        self.assertEqual(qa.look_stats(flat[None])["areas"], 2)
+        self.assertEqual(qa.look_stats(layered[None])["areas"], 8)
 
 
 class LifeFramesTest(unittest.TestCase):

@@ -3,6 +3,26 @@
 Rules distilled from the owner's feedback. Newest first. Each rule says where it came from.
 These override docs/style/style-guide.md when they disagree.
 
+## 2026-10-27 (ep007 v4 with backdrop C)
+
+- **L33 v4 with backdrop C is the house look.** The owner approved ep007 v4 (Pip plus the layered
+  scenery and light of option C) and moved ep005 and ep006 to it. Every episode sets
+  `"look": "v4"` and builds its shots from engine/flat.ts, hero.ts and props.ts: `ground()` on
+  land, `space()` in space (stars, nebula strips, the same light), `foreground()` after any land
+  shape that covers the backdrop's lower half. Older looks are kept only as `-v3` backups.
+
+## 2026-10-27 (ep007 v4 pilot)
+
+- **L31 Backgrounds are scenery, never a flat colour.** Keep v4's bright palette and one big
+  subject, but put a world behind it: at least three depth layers (far: sky detail or haze, mid:
+  scenery, near: foreground pieces), light (a glow behind the subject, rays or a gradient toward
+  the light) and small moving life (particles, drifting clouds). The pilot's single flat colour
+  read as "too simplified" to the owner. This strengthens the style guide's depth rule, which the
+  pilot broke, and withdraws K3's edge-density target (detail is wanted, dither noise is not).
+- **L32 Keep the v4 storytelling.** Pip is the protagonist, one big subject per shot, faces on
+  things, numbers on pills next to their objects, captions of at most three words on one line,
+  and the title only in the hook and the loop frame. The owner liked this flow.
+
 ## 2026-10-26 (competitor analysis)
 
 The owner adopted the rules from docs/research/competitor-shorts.md: ten top science Shorts watched

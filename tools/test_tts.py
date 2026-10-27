@@ -64,8 +64,8 @@ class MainTest(unittest.TestCase):
 
 
 class MainCoverTest(unittest.TestCase):
-    def run_main(self, cover):
-        episode = {"id": "ep999", "title": "t", "voice": "am_michael", "speed": 1.2, "cover": cover, "scenes": [
+    def run_main(self, cover, **extra):
+        episode = {"id": "ep999", "title": "t", "voice": "am_michael", "speed": 1.2, "cover": cover, **extra, "scenes": [
             {"visual": "a-hook", "beat": "hook", "vo": ["Hello there."]},
             {"visual": "a-peak", "beat": "peak", "vo": ["Hi."]},
         ]}
@@ -89,6 +89,15 @@ class MainCoverTest(unittest.TestCase):
         cover = {"title": "Why?", "scene": "a-peak", "t": 0.5}
         manifest = self.run_main(cover)
         self.assertEqual(manifest["cover"], cover)
+
+    def test_main_copies_the_look_into_the_manifest_only_when_set(self):
+        cover = {"title": "Why?", "scene": "a-peak", "t": 0.5}
+        self.assertEqual(self.run_main(cover, look="v4")["look"], "v4")
+        self.assertNotIn("look", self.run_main(cover))
+
+    def test_main_rejects_an_unknown_look(self):
+        with self.assertRaises(ValueError):
+            self.run_main({"title": "Why?", "scene": "a-peak", "t": 0.5}, look="V4")
 
     def test_main_rejects_a_cover_time_outside_its_scene(self):
         with self.assertRaises(ValueError):

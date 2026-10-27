@@ -4,6 +4,7 @@
   "voice": "am_michael",
   "speed": 1.18,
   "detail": 2,
+  "look": "v4",
   "trend": "Evergreen popular question (L12): why thunder booms; lightning is 5x hotter than the Sun's surface",
   "sources": [
     "NOAA National Weather Service Fort Worth, Lightning: Did you know? (public domain) - https://www.weather.gov/fwd/lightdidyouknow",

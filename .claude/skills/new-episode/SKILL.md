@@ -20,7 +20,7 @@ Read docs/style/style-guide.md and docs/style/learnings.md first. Every rule the
    channel yet (L13). Plan the episode as one camera journey through it (style guide). For each
    scene pick the shot and what changes on screen every 2-3 s. Make the last frame rhyme with the
    first. Write new area renderers at fine detail (L14: `+= PX` loops and `buf.dot`).
-4. **Episode file.** Write `episodes/NNN-slug.json` with `"detail": 2` (copy the latest episode
+4. **Episode file.** Write `episodes/NNN-slug.json` with `"detail": 2` and `"look": "v4"` (L33; copy the latest episode
    as a template) and register its manifest in `remotion/src/Root.tsx`. Add a `cover` (L20) and
    start the caption with the searchable question on its own line (L22).
 5. **Build.** `./build.sh episodes/NNN-slug.json`.
